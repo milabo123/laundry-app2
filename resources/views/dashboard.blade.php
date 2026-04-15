@@ -83,19 +83,29 @@
     </div>
 </div>
 
-{{-- Quick Actions --}}
+@if(in_array(auth()->user()->id_level, [1, 2])) {{-- Admin & Operator --}} {{-- Quick Actions --}}
 <div class="card" style="margin-top:24px;">
     <div class="card-title" style="margin-bottom:16px;">⚡ Aksi Cepat</div>
     <div style="display:flex;gap:12px;flex-wrap:wrap;">
+
+    @if(in_array(auth()->user()->id_level, [2])) {{-- Operator --}}
         <a href="{{ route('orders.create') }}" class="btn btn-primary">
             <i class="fas fa-plus"></i> Buat Order Baru
         </a>
+    @endif
+
+    @if(in_array(auth()->user()->id_level, [1, 2])) {{-- Admin & Operator --}}
         <a href="{{ route('customers.create') }}" class="btn btn-success">
             <i class="fas fa-user-plus"></i> Tambah Pelanggan
         </a>
+    @endif
+
+    @if(in_array(auth()->user()->id_level, [1])) {{-- Admin --}}
         <a href="{{ route('services.create') }}" class="btn btn-info">
             <i class="fas fa-plus-circle"></i> Tambah Layanan
         </a>
+    @endif
     </div>
 </div>
+@endif
 @endsection

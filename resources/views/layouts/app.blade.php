@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Laundry-Wit - Sistem Manajemen Laundry Professional">
-    <title>@yield('title', 'Dashboard') - Laundry-Wit</title>
+    <title>@yield('title', 'Dashboard') - LaundryLaundryan</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -271,19 +271,21 @@
     {{-- SIDEBAR --}}
     <aside class="sidebar">
         <div class="sidebar-logo">
-            <div class="logo-icon">👕</div>
+            <div class="logo-icon">🤣</div>
             <div>
-                <div class="logo-text">Laundry-Wit</div>
-                <div class="logo-sub">Laundry Management</div>
+                <div class="logo-text">LaundryPPKD</div>
+                <div class="logo-sub">Laundry</div>
             </div>
         </div>
         <nav class="sidebar-nav">
+            @if(in_array(auth()->user()->id_level, [3])) {{-- Pimpinan --}}
             <div class="nav-section">
                 <div class="nav-label">Menu Utama</div>
                 <a href="{{ route('dashboard') }}" class="nav-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
                     <i class="fas fa-chart-pie"></i> Dashboard
                 </a>
             </div>
+            @endif
 
             @if(in_array(auth()->user()->id_level, [1])) {{-- Admin --}}
             <div class="nav-section">
@@ -304,6 +306,9 @@
                     <i class="fas fa-users"></i> Data Pelanggan
                 </a>
             </div>
+            @endif
+
+            @if(in_array(auth()->user()->id_level, [2])) {{-- Operator --}}
             <div class="nav-section">
                 <div class="nav-label">Transaksi</div>
                 <a href="{{ route('orders.index') }}" class="nav-item {{ request()->routeIs('orders.*') ? 'active' : '' }}">
@@ -312,7 +317,7 @@
             </div>
             @endif
 
-            @if(in_array(auth()->user()->id_level, [1, 3])) {{-- Admin & Pimpinan --}}
+            @if(in_array(auth()->user()->id_level, [3])) {{-- Pimpinan --}}
             <div class="nav-section">
                 <div class="nav-label">Laporan</div>
                 <a href="{{ route('report.index') }}" class="nav-item {{ request()->routeIs('report.*') ? 'active' : '' }}">
