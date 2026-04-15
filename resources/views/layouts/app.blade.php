@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Gunawan Laundry - Sistem Manajemen Laundry Professional">
-    <title>@yield('title', 'Dashboard') - Gunawan Laundry</title>
+    <meta name="description" content="Laundry-Wit - Sistem Manajemen Laundry Professional">
+    <title>@yield('title', 'Dashboard') - Laundry-Wit</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -271,9 +271,9 @@
     {{-- SIDEBAR --}}
     <aside class="sidebar">
         <div class="sidebar-logo">
-            <div class="logo-icon">🧺</div>
+            <div class="logo-icon">👕</div>
             <div>
-                <div class="logo-text">Gunawan</div>
+                <div class="logo-text">Laundry-Wit</div>
                 <div class="logo-sub">Laundry Management</div>
             </div>
         </div>
@@ -343,7 +343,7 @@
         <header class="topbar">
             <div>
                 <div class="topbar-title">@yield('page-title', 'Dashboard')</div>
-                <div class="topbar-breadcrumb">Gunawan Laundry &rsaquo; @yield('page-title', 'Dashboard')</div>
+                <div class="topbar-breadcrumb">Laundry-Wit &rsaquo; @yield('page-title', 'Dashboard')</div>
             </div>
             <div style="font-size: 13px; color: var(--text-muted);">
                 <i class="fas fa-clock"></i>

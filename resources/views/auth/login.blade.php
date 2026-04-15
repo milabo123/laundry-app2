@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Login - Gunawan Laundry Management System">
-    <title>Login - Gunawan Laundry</title>
+    <meta name="description" content="Login - Laundry-Wit Management System">
+    <title>Login - Laundry-Wit</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -125,9 +125,9 @@
 
     <div class="login-card">
         <div class="login-logo">
-            <div class="icon">🧺</div>
+            <div class="icon">👕</div>
             <div>
-                <h1>Gunawan Laundry</h1>
+                <h1>Laundry-Wit</h1>
                 <p>Sistem Manajemen Laundry</p>
             </div>
         </div>
