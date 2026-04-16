@@ -5,7 +5,7 @@
 @section('content')
 <div class="card" style="max-width:600px;">
     <div class="card-header">
-        <div class="card-title">🛡️ Form Tambah Pengguna Baru</div>
+        <div class="card-title"><i class="bi bi-shield-lock"></i> Form Tambah Pengguna Baru</div>
         <a href="{{ route('users.index') }}" class="btn btn-secondary btn-sm">
             <i class="fas fa-arrow-left"></i> Kembali
         </a>

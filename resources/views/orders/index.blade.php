@@ -5,7 +5,7 @@
 @section('content')
 <div class="card">
     <div class="card-header">
-        <div class="card-title">📋 Daftar Order Laundry</div>
+        <div class="card-title"><i class="bi bi-clipboard-data"></i> Daftar Order Laundry</div>
         <a href="{{ route('orders.create') }}" class="btn btn-primary">
             <i class="fas fa-plus"></i> Buat Order
         </a>
@@ -50,14 +50,14 @@
                     <tr>
                         <td style="color:#64748b;">{{ $orders->firstItem() + $i }}</td>
                         <td>
-                            <span style="font-weight:700;color:#a5b4fc;font-family:monospace;font-size:13px;">{{ $o->order_code }}</span>
+                            <span style="font-weight:700;color:var(--primary-dark);font-family:monospace;font-size:13px;">{{ $o->order_code }}</span>
                         </td>
                         <td style="font-weight:500;">{{ $o->customer->customer_name ?? '-' }}</td>
                         <td style="color:#94a3b8;font-size:13px;">{{ $o->order_date->format('d M Y') }}</td>
                         <td style="color:#94a3b8;font-size:13px;">
                             {{ $o->order_end_date ? $o->order_end_date->format('d M Y') : '-' }}
                         </td>
-                        <td style="font-weight:700;color:#6ee7b7;">
+                        <td style="font-weight:700;color:var(--primary);">
                             Rp {{ number_format($o->total, 0, ',', '.') }}
                         </td>
                         <td><span class="badge badge-{{ $o->status_color }}">{{ $o->status_label }}</span></td>
@@ -82,7 +82,7 @@
                 @empty
                     <tr>
                         <td colspan="8" style="text-align:center;padding:40px;color:#64748b;">
-                            <div style="font-size:36px;margin-bottom:10px;">📋</div>
+                            <div style="font-size:36px;margin-bottom:10px;"><i class="bi bi-clipboard-data"></i></div>
                             Belum ada data order
                         </td>
                     </tr>

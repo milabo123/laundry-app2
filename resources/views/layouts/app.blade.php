@@ -3,35 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Laundry-Wit - Sistem Manajemen Laundry Professional">
+    <meta name="description" content="LaundryLaundryan - Sistem Manajemen Laundry Professional">
     <title>@yield('title', 'Dashboard') - LaundryLaundryan</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
         :root {
-            --primary: #4f46e5;
-            --primary-dark: #3730a3;
-            --primary-light: #818cf8;
-            --secondary: #06b6d4;
-            --success: #10b981;
-            --warning: #f59e0b;
+            --primary: #16a34a;
+            --primary-dark: #15803d;
+            --primary-light: #4ade80;
+            --secondary: #eab308;
+            --success: #16a34a;
+            --warning: #facc15;
             --danger: #ef4444;
             --info: #3b82f6;
-            --dark: #0f172a;
-            --dark2: #1e293b;
-            --dark3: #334155;
-            --text: #e2e8f0;
-            --text-muted: #94a3b8;
-            --border: #334155;
-            --card: #1e293b;
+            --white: #ffffff;
+            --text: #1f2937;
+            --text-muted: #6b7280;
+            --border: #e5e7eb;
+            --card: #ffffff;
             --sidebar-w: 260px;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Inter', sans-serif;
-            background: var(--dark);
+            background: #f8fafc;
             color: var(--text);
             display: flex;
             min-height: 100vh;
@@ -39,7 +38,7 @@
         /* ---- SIDEBAR ---- */
         .sidebar {
             width: var(--sidebar-w);
-            background: var(--dark2);
+            background: var(--primary);
             position: fixed;
             top: 0; left: 0; bottom: 0;
             overflow-y: auto;
@@ -58,36 +57,35 @@
         }
         .sidebar-logo .logo-icon {
             width: 42px; height: 42px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            background: var(--secondary);
             border-radius: 12px;
             display: flex; align-items: center; justify-content: center;
             font-size: 20px;
+            color: var(--primary);
         }
-        .sidebar-logo .logo-text { font-size: 18px; font-weight: 700; }
-        .sidebar-logo .logo-sub  { font-size: 11px; color: var(--text-muted); }
+        .sidebar-logo .logo-text { font-size: 18px; font-weight: 700; color: #fff; }
+        .sidebar-logo .logo-sub  { font-size: 11px; color: rgba(255,255,255,.7); }
         .sidebar-nav { padding: 16px 12px; flex: 1; }
         .nav-section { margin-bottom: 8px; }
         .nav-label {
-            font-size: 10px; font-weight: 600; color: var(--text-muted);
+            font-size: 10px; font-weight: 600; color: rgba(255,255,255,.6);
             text-transform: uppercase; letter-spacing: 1px;
             padding: 8px 10px 4px;
         }
         .nav-item {
             display: flex; align-items: center; gap: 12px;
             padding: 10px 12px; border-radius: 10px;
-            color: var(--text-muted); text-decoration: none;
+            color: #fff; text-decoration: none;
             font-size: 14px; font-weight: 500;
             transition: all .2s;
             margin-bottom: 2px;
         }
         .nav-item:hover {
-            background: rgba(79,70,229,.15);
-            color: var(--primary-light);
+            background: rgba(255,255,255,.12);
         }
         .nav-item.active {
-            background: linear-gradient(135deg, rgba(79,70,229,.3), rgba(6,182,212,.15));
-            color: #fff;
-            box-shadow: 0 0 0 1px rgba(79,70,229,.3);
+            background: var(--secondary);
+            color: var(--primary-dark);
         }
         .nav-item i { width: 20px; text-align: center; font-size: 15px; }
         .sidebar-footer {
@@ -102,12 +100,13 @@
         }
         .user-avatar {
             width: 36px; height: 36px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            background: var(--secondary);
+            color: var(--primary);
             border-radius: 50%; display: flex; align-items: center; justify-content: center;
             font-weight: 700; font-size: 14px;
         }
-        .user-name  { font-size: 13px; font-weight: 600; }
-        .user-email { font-size: 11px; color: var(--text-muted); }
+        .user-name  { font-size: 13px; font-weight: 600; color: #fff; }
+        .user-email { font-size: 11px; color: rgba(255,255,255,.7); }
         .btn-logout {
             width: 100%;
             display: flex; align-items: center; justify-content: center; gap: 8px;
@@ -128,8 +127,7 @@
         }
         .topbar {
             height: 64px;
-            background: rgba(30,41,59,.8);
-            backdrop-filter: blur(12px);
+            background: #fff;
             border-bottom: 1px solid var(--border);
             display: flex; align-items: center; justify-content: space-between;
             padding: 0 24px;
@@ -181,12 +179,12 @@
             padding: 4px 10px; border-radius: 20px;
             font-size: 11px; font-weight: 600;
         }
-        .badge-success  { background: rgba(16,185,129,.2); color: #34d399; }
-        .badge-warning  { background: rgba(245,158,11,.2); color: #fbbf24; }
-        .badge-info     { background: rgba(59,130,246,.2); color: #60a5fa; }
-        .badge-primary  { background: rgba(79,70,229,.2);  color: #a5b4fc; }
-        .badge-danger   { background: rgba(239,68,68,.2);  color: #f87171; }
-        .badge-secondary{ background: rgba(148,163,184,.2);color: #cbd5e1; }
+        .badge-success  { background: #dcfce7; color: #16a34a; }
+        .badge-warning  { background: #fef9c3; color: #a16207; }
+        .badge-info     { background: #fef9c3; color: #a16207; }
+        .badge-primary  { background: #dcfce7; color: #16a34a; }
+        .badge-danger   { background: #fee2e2; color: #dc2626; }
+        .badge-secondary{ background: #f1f5f9; color: #475569; }
         /* ---- BUTTONS ---- */
         .btn {
             display: inline-flex; align-items: center; gap: 6px;
@@ -196,24 +194,28 @@
             transition: all .2s;
         }
         .btn-primary {
-            background: linear-gradient(135deg, var(--primary), #6366f1);
+            background: var(--primary);
             color: #fff;
-            box-shadow: 0 4px 12px rgba(79,70,229,.3);
+            box-shadow: 0 4px 12px rgba(22,163,74,.3);
         }
-        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(79,70,229,.4); }
-        .btn-secondary { background: rgba(255,255,255,.07); color: var(--text-muted); border: 1px solid var(--border); }
-        .btn-secondary:hover { background: rgba(255,255,255,.12); color: var(--text); }
-        .btn-success { background: rgba(16,185,129,.2); color: #34d399; border: 1px solid rgba(16,185,129,.3); }
-        .btn-danger  { background: rgba(239,68,68,.15); color: #f87171; border: 1px solid rgba(239,68,68,.2); }
-        .btn-warning { background: rgba(245,158,11,.15); color: #fbbf24; border: 1px solid rgba(245,158,11,.2); }
-        .btn-info    { background: rgba(59,130,246,.15); color: #60a5fa; border: 1px solid rgba(59,130,246,.2); }
+        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(22,163,74,.4); }
+        .btn-secondary { background: #f1f5f9; color: var(--text); border: 1px solid var(--border); }
+        .btn-secondary:hover { background: #e2e8f0; }
+        .btn-success { background: var(--primary); color: #fff; }
+        .btn-success:hover { background: var(--primary-dark); }
+        .btn-danger  { background: #dc2626; color: #fff; }
+        .btn-danger:hover { background: #b91c1c; }
+        .btn-warning { background: var(--secondary); color: var(--primary-dark); }
+        .btn-warning:hover { background: #eab308; }
+        .btn-info    { background: var(--secondary); color: var(--primary-dark); }
+        .btn-info:hover { background: #eab308; }
         .btn-sm { padding: 5px 10px; font-size: 12px; border-radius: 6px; }
         /* ---- FORMS ---- */
         .form-group { margin-bottom: 20px; }
         .form-label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 8px; color: var(--text); }
         .form-control {
             width: 100%; padding: 10px 14px;
-            background: rgba(255,255,255,.05);
+            background: #fff;
             border: 1px solid var(--border);
             border-radius: 10px; color: var(--text);
             font-size: 14px; font-family: inherit;
@@ -222,8 +224,7 @@
         .form-control:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(79,70,229,.2);
-            background: rgba(255,255,255,.07);
+            box-shadow: 0 0 0 3px rgba(22,163,74,.2);
         }
         .form-control::placeholder { color: var(--text-muted); }
         select.form-control option { background: var(--dark2); }
@@ -271,7 +272,7 @@
     {{-- SIDEBAR --}}
     <aside class="sidebar">
         <div class="sidebar-logo">
-            <div class="logo-icon">🤣</div>
+            <div class="logo-icon"><i class="bi bi-droplet-half"></i></div>
             <div>
                 <div class="logo-text">LaundryPPKD</div>
                 <div class="logo-sub">Laundry</div>
@@ -348,7 +349,7 @@
         <header class="topbar">
             <div>
                 <div class="topbar-title">@yield('page-title', 'Dashboard')</div>
-                <div class="topbar-breadcrumb">Laundry-Wit &rsaquo; @yield('page-title', 'Dashboard')</div>
+                <div class="topbar-breadcrumb">LaundryLaundryan &rsaquo; @yield('page-title', 'Dashboard')</div>
             </div>
             <div style="font-size: 13px; color: var(--text-muted);">
                 <i class="fas fa-clock"></i>

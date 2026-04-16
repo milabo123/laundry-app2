@@ -5,7 +5,7 @@
 @section('content')
 <div class="card">
     <div class="card-header">
-        <div class="card-title">👥 Daftar Pelanggan</div>
+        <div class="card-title"><i class="bi bi-people"></i> Daftar Pelanggan</div>
         <a href="{{ route('customers.create') }}" class="btn btn-primary">
             <i class="fas fa-user-plus"></i> Tambah Pelanggan
         </a>
@@ -44,7 +44,7 @@
                         <td style="color:#64748b;">{{ $customers->firstItem() + $i }}</td>
                         <td>
                             <div style="display:flex;align-items:center;gap:10px;">
-                                <div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#4f46e5,#06b6d4);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0;">
+                                <div style="width:34px;height:34px;border-radius:50%;background:var(--secondary);color:var(--primary-dark);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0;">
                                     {{ strtoupper(substr($c->customer_name, 0, 1)) }}
                                 </div>
                                 <span style="font-weight:600;">{{ $c->customer_name }}</span>
@@ -71,7 +71,7 @@
                 @empty
                     <tr>
                         <td colspan="6" style="text-align:center;padding:40px;color:#64748b;">
-                            <div style="font-size:36px;margin-bottom:10px;">👤</div>
+                            <div style="font-size:36px;margin-bottom:10px;"><i class="bi bi-person"></i></div>
                             Belum ada data pelanggan
                         </td>
                     </tr>

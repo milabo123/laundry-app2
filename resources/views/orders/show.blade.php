@@ -8,7 +8,7 @@
         {{-- Order Info --}}
         <div class="card">
             <div class="card-header">
-                <div class="card-title">📋 Informasi Order</div>
+                <div class="card-title"><i class="bi bi-clipboard-data"></i> Informasi Order</div>
                 <div style="display:flex;gap:8px;">
                     <a href="{{ route('orders.edit', $order) }}" class="btn btn-info btn-sm">
                         <i class="fas fa-edit"></i> Edit
@@ -21,7 +21,7 @@
 
             <div class="detail-row">
                 <div class="detail-label">Kode Order</div>
-                <div class="detail-value" style="font-weight:700;font-family:monospace;color:#a5b4fc;">{{ $order->order_code }}</div>
+                <div class="detail-value" style="font-weight:700;font-family:monospace;color:var(--primary-dark);">{{ $order->order_code }}</div>
             </div>
             <div class="detail-row">
                 <div class="detail-label">Pelanggan</div>
@@ -48,7 +48,7 @@
 
             {{-- Update Status --}}
             <hr class="divider">
-            <div style="font-weight:600;font-size:14px;margin-bottom:12px;">⚡ Ubah Status Order</div>
+            <div style="font-weight:600;font-size:14px;margin-bottom:12px;"><i class="bi bi-lightning-charge"></i> Ubah Status Order</div>
             <form method="POST" action="{{ route('orders.updateStatus', $order) }}" style="display:flex;gap:8px;flex-wrap:wrap;">
                 @csrf @method('PATCH')
                 @foreach([0 => ['Baru','warning'], 1 => ['Sudah Diambil','success']] as $val => $info)
@@ -63,7 +63,7 @@
 
         {{-- Detail Items --}}
         <div class="card">
-            <div class="card-title" style="margin-bottom:16px;">🧴 Detail Layanan</div>
+            <div class="card-title" style="margin-bottom:16px;"><i class="bi bi-droplet"></i> Detail Layanan</div>
             <div class="table-wrap">
                 <table>
                     <thead>
@@ -83,7 +83,7 @@
                             <td style="font-weight:600;">{{ $d->service->service_name ?? '-' }}</td>
                             <td style="color:#94a3b8;">Rp {{ number_format($d->service->price ?? 0, 0, ',', '.') }}/kg</td>
                             <td>{{ $d->qty }} g</td>
-                            <td style="font-weight:700;color:#6ee7b7;">Rp {{ number_format($d->subtotal, 0, ',', '.') }}</td>
+                            <td style="font-weight:700;color:var(--primary);">Rp {{ number_format($d->subtotal, 0, ',', '.') }}</td>
                             <td style="color:#94a3b8;font-size:13px;">{{ $d->notes ?? '-' }}</td>
                         </tr>
                         @endforeach
@@ -96,8 +96,8 @@
 
     {{-- Payment Summary --}}
     <div style="position:sticky;top:80px;">
-        <div class="card" style="background:linear-gradient(145deg,rgba(79,70,229,.15),rgba(6,182,212,.1));border-color:rgba(79,70,229,.3);">
-            <div class="card-title" style="margin-bottom:20px;">💰 Ringkasan Pembayaran</div>
+        <div class="card" style="background:#f8fafc; border-color:var(--border);">
+            <div class="card-title" style="margin-bottom:20px;"><i class="bi bi-cash-stack"></i> Ringkasan Pembayaran</div>
 
             @foreach($order->details as $d)
             <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px;">
@@ -110,7 +110,7 @@
 
             <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
                 <span style="font-weight:600;">Total</span>
-                <span style="font-size:22px;font-weight:800;color:#6ee7b7;font-family:monospace;">
+                <span style="font-size:22px;font-weight:800;color:var(--primary);font-family:monospace;">
                     Rp {{ number_format($order->total, 0, ',', '.') }}
                 </span>
             </div>
@@ -118,14 +118,14 @@
             @if($order->order_pay)
             <div style="display:flex;justify-content:space-between;font-size:14px;margin-bottom:6px;">
                 <span style="color:#94a3b8;">Bayar</span>
-                <span style="color:#60a5fa;">Rp {{ number_format($order->order_pay, 0, ',', '.') }}</span>
+                <span style="color:var(--primary-dark);">Rp {{ number_format($order->order_pay, 0, ',', '.') }}</span>
             </div>
             @endif
 
             @if($order->order_change)
             <div style="display:flex;justify-content:space-between;font-size:14px;">
                 <span style="color:#94a3b8;">Kembalian</span>
-                <span style="color:#fbbf24;">Rp {{ number_format($order->order_change, 0, ',', '.') }}</span>
+                <span style="color:var(--secondary);">Rp {{ number_format($order->order_change, 0, ',', '.') }}</span>
             </div>
             @endif
         </div>

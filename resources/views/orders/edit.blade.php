@@ -5,14 +5,14 @@
 @push('styles')
 <style>
     .detail-line {
-        background: rgba(255,255,255,.04);
+        background: #f1f5f9;
         border: 1px solid var(--border);
         border-radius: 12px;
         padding: 14px 16px;
         margin-bottom: 10px;
     }
     .remove-row {
-        background: rgba(239,68,68,.15); color:#f87171;
+        background: #fee2e2; color:#dc2626;
         border: 1px solid rgba(239,68,68,.2);
         border-radius: 8px; cursor:pointer;
         width: 34px; height: 34px;
@@ -20,7 +20,7 @@
         transition: all .2s; font-size: 14px;
     }
     .remove-row:hover { background: rgba(239,68,68,.3); }
-    #total-display { font-size: 22px; font-weight: 800; color: #6ee7b7; font-family: monospace; }
+    #total-display { font-size: 22px; font-weight: 800; color: var(--primary); font-family: monospace; }
 </style>
 @endpush
 
@@ -29,7 +29,7 @@
     <div>
         <div class="card">
             <div class="card-header">
-                <div class="card-title">✏️ Edit Order {{ $order->order_code }}</div>
+                <div class="card-title"><i class="bi bi-pencil-square"></i> Edit Order {{ $order->order_code }}</div>
                 <a href="{{ route('orders.show', $order) }}" class="btn btn-secondary btn-sm">
                     <i class="fas fa-arrow-left"></i> Kembali
                 </a>
@@ -75,7 +75,7 @@
 
                 <hr class="divider">
                 <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-                    <div style="font-weight:700;font-size:15px;">🧴 Detail Layanan</div>
+                    <div style="font-weight:700;font-size:15px;"><i class="bi bi-droplet"></i> Detail Layanan</div>
                     <button type="button" class="btn btn-secondary btn-sm" onclick="addRow()">
                         <i class="fas fa-plus"></i> Tambah Baris
                     </button>
@@ -94,11 +94,11 @@
 
     <div style="position:sticky;top:80px;">
         <div class="card">
-            <div class="card-title" style="margin-bottom:16px;">💰 Ringkasan</div>
+            <div class="card-title" style="margin-bottom:16px;"><i class="bi bi-cash-stack"></i> Ringkasan</div>
             <div id="summary-list" style="display:grid;gap:8px;margin-bottom:16px;"></div>
             <hr class="divider">
             <div style="display:flex;justify-content:space-between;align-items:center;">
-                <span style="color:#94a3b8;">Total</span>
+                <span style="color:var(--text-muted);">Total</span>
                 <div id="total-display">Rp 0</div>
             </div>
         </div>
@@ -165,8 +165,8 @@ function calcTotal() {
         if (sel.value && qty > 0) {
             row.querySelector('.svc-subtotal').textContent = `Subtotal: Rp ${sub.toLocaleString('id-ID')}`;
             html += `<div style="display:flex;justify-content:space-between;font-size:13px;">
-                <span style="color:#94a3b8;">${opt.text.split('–')[0].trim()} x ${qty}g</span>
-                <span>Rp ${sub.toLocaleString('id-ID')}</span></div>`;
+                <span style="color:var(--text-muted);">${opt.text.split('–')[0].trim()} x ${qty}g</span>
+                <span style="color:var(--text);">Rp ${sub.toLocaleString('id-ID')}</span></div>`;
         } else {
             row.querySelector('.svc-subtotal').textContent = '';
         }

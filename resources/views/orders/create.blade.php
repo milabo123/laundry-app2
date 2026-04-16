@@ -5,7 +5,7 @@
 @push('styles')
 <style>
     .detail-line {
-        background: rgba(255,255,255,.04);
+        background: #f1f5f9;
         border: 1px solid var(--border);
         border-radius: 12px;
         padding: 14px 16px;
@@ -14,7 +14,7 @@
     }
     .detail-line .grid { align-items: center; }
     .remove-row {
-        background: rgba(239,68,68,.15); color:#f87171;
+        background: #fee2e2; color:#dc2626;
         border: 1px solid rgba(239,68,68,.2);
         border-radius: 8px; cursor:pointer;
         width: 34px; height: 34px;
@@ -24,7 +24,7 @@
     .remove-row:hover { background: rgba(239,68,68,.3); }
     #total-display {
         font-size: 22px; font-weight: 800;
-        color: #6ee7b7; font-family: monospace;
+        color: var(--primary); font-family: monospace;
     }
 </style>
 @endpush
@@ -34,7 +34,7 @@
     <div>
         <div class="card">
             <div class="card-header">
-                <div class="card-title">📋 Form Buat Order</div>
+                <div class="card-title"><i class="bi bi-clipboard-plus"></i> Form Buat Order</div>
                 <a href="{{ route('orders.index') }}" class="btn btn-secondary btn-sm">
                     <i class="fas fa-arrow-left"></i> Kembali
                 </a>
@@ -72,7 +72,7 @@
 
                 <hr class="divider">
                 <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-                    <div style="font-weight:700;font-size:15px;">🧴 Detail Layanan</div>
+                    <div style="font-weight:700;font-size:15px;"><i class="bi bi-droplet"></i> Detail Layanan</div>
                     <button type="button" class="btn btn-secondary btn-sm" onclick="addRow()">
                         <i class="fas fa-plus"></i> Tambah Layanan
                     </button>
@@ -94,7 +94,7 @@
     {{-- Summary panel --}}
     <div style="position:sticky;top:80px;">
         <div class="card">
-            <div class="card-title" style="margin-bottom:16px;">💰 Ringkasan Order</div>
+            <div class="card-title" style="margin-bottom:16px;"><i class="bi bi-cash-stack"></i> Ringkasan Order</div>
             <div id="summary-list" style="display:grid;gap:8px;margin-bottom:16px;"></div>
             <hr class="divider">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
@@ -102,13 +102,13 @@
                 <div id="total-display">Rp 0</div>
             </div>
             <div class="form-group" style="margin-bottom:12px;">
-                <label style="font-size:13px;color:#cbd5e1;">Uang Bayar (Rp)</label>
+                <label style="font-size:13px;color:var(--text-muted);">Uang Bayar (Rp)</label>
                 <input type="number" name="order_pay" id="order_pay" class="form-control"
                     placeholder="0" min="0" oninput="calcTotal()" style="text-align:right;">
             </div>
             <div style="display:flex;align-items:center;justify-content:space-between;">
                 <span style="color:#94a3b8;font-size:14px;">Kembalian</span>
-                <div id="change-display" style="font-size:18px;font-weight:700;color:#fcd34d;">Rp 0</div>
+                <div id="change-display" style="font-size:18px;font-weight:700;color:var(--secondary);">Rp 0</div>
             </div>
         </div>
     </div>
@@ -186,8 +186,8 @@ function calcTotal() {
         if (sel.value && qty > 0) {
             row.querySelector('.svc-subtotal').textContent = `Subtotal: Rp ${subtotal.toLocaleString('id-ID')}`;
             summaryHtml += `<div style="display:flex;justify-content:space-between;font-size:13px;">
-                <span style="color:#94a3b8;">${opt.text.split('–')[0].trim()} x ${qty}g</span>
-                <span style="color:#e2e8f0;">Rp ${subtotal.toLocaleString('id-ID')}</span>
+                <span style="color:var(--text-muted);">${opt.text.split('–')[0].trim()} x ${qty}g</span>
+                <span style="color:var(--text);">Rp ${subtotal.toLocaleString('id-ID')}</span>
             </div>`;
         } else {
             row.querySelector('.svc-subtotal').textContent = '';

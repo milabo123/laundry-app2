@@ -5,7 +5,7 @@
 @section('content')
 <div class="card">
     <div class="card-header">
-        <div class="card-title">🛎️ Daftar Jenis Layanan</div>
+        <div class="card-title"><i class="bi bi-bell"></i> Daftar Jenis Layanan</div>
         <a href="{{ route('services.create') }}" class="btn btn-primary">
             <i class="fas fa-plus"></i> Tambah Layanan
         </a>
@@ -43,12 +43,12 @@
                         <td style="color:#64748b;">{{ $services->firstItem() + $i }}</td>
                         <td>
                             <div style="display:flex;align-items:center;gap:10px;">
-                                <div style="width:34px;height:34px;border-radius:10px;background:rgba(6,182,212,.2);border:1px solid rgba(6,182,212,.3);display:flex;align-items:center;justify-content:center;font-size:16px;">🧴</div>
+                                <div style="width:34px;height:34px;border-radius:10px;background:rgba(234,179,8,.15);border:1px solid rgba(234,179,8,.3);display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--primary-dark);"><i class="bi bi-droplet"></i></div>
                                 <span style="font-weight:600;">{{ $s->service_name }}</span>
                             </div>
                         </td>
                         <td>
-                            <span style="font-weight:700;color:#6ee7b7;">Rp {{ number_format($s->price, 0, ',', '.') }}</span>
+                            <span style="font-weight:700;color:var(--primary);">Rp {{ number_format($s->price, 0, ',', '.') }}</span>
                         </td>
                         <td style="color:#94a3b8;font-size:13px;max-width:200px;">{{ Str::limit($s->description, 60) ?? '-' }}</td>
                         <td style="color:#64748b;font-size:13px;">{{ $s->created_at->format('d M Y') }}</td>
@@ -70,7 +70,7 @@
                 @empty
                     <tr>
                         <td colspan="6" style="text-align:center;padding:40px;color:#64748b;">
-                            <div style="font-size:36px;margin-bottom:10px;">🧴</div>
+                            <div style="font-size:36px;margin-bottom:10px;"><i class="bi bi-droplet"></i></div>
                             Belum ada jenis layanan
                         </td>
                     </tr>

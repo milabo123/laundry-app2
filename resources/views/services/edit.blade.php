@@ -5,7 +5,7 @@
 @section('content')
 <div class="card" style="max-width:600px;">
     <div class="card-header">
-        <div class="card-title">✏️ Edit Layanan</div>
+        <div class="card-title"><i class="bi bi-pencil-square"></i> Edit Layanan</div>
         <a href="{{ route('services.index') }}" class="btn btn-secondary btn-sm">
             <i class="fas fa-arrow-left"></i> Kembali
         </a>

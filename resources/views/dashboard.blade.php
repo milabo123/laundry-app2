@@ -5,30 +5,30 @@
 @section('content')
 {{-- Stat Cards --}}
 <div class="grid grid-3" style="margin-bottom:24px;">
-    <div class="card" style="margin-bottom:0; background: linear-gradient(135deg,rgba(79,70,229,.25),rgba(79,70,229,.1)); border-color:rgba(79,70,229,.3);">
+    <div class="card" style="margin-bottom:0; background: var(--primary); border-color: var(--primary-dark);">
         <div style="display:flex;align-items:center;gap:16px;">
-            <div style="width:52px;height:52px;background:rgba(79,70,229,.3);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;">👥</div>
+            <div style="width:52px;height:52px;background:rgba(255,255,255,.2);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;color:#fff;"><i class="bi bi-people"></i></div>
             <div>
-                <div style="font-size:28px;font-weight:800;color:#a5b4fc;">{{ $totalCustomers }}</div>
-                <div style="font-size:12px;color:#94a3b8;margin-top:2px;">Total Pelanggan</div>
+                <div style="font-size:28px;font-weight:800;color:#fff;">{{ $totalCustomers }}</div>
+                <div style="font-size:12px;color:rgba(255,255,255,.8);margin-top:2px;">Total Pelanggan</div>
             </div>
         </div>
     </div>
-    <div class="card" style="margin-bottom:0; background: linear-gradient(135deg,rgba(6,182,212,.25),rgba(6,182,212,.1)); border-color:rgba(6,182,212,.3);">
+    <div class="card" style="margin-bottom:0; background: var(--secondary); border-color: var(--warning);">
         <div style="display:flex;align-items:center;gap:16px;">
-            <div style="width:52px;height:52px;background:rgba(6,182,212,.3);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;">📋</div>
+            <div style="width:52px;height:52px;background:rgba(0,0,0,.05);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;color:var(--primary-dark);"><i class="bi bi-clipboard-data"></i></div>
             <div>
-                <div style="font-size:28px;font-weight:800;color:#67e8f9;">{{ $totalOrders }}</div>
-                <div style="font-size:12px;color:#94a3b8;margin-top:2px;">Total Order</div>
+                <div style="font-size:28px;font-weight:800;color:var(--primary-dark);">{{ $totalOrders }}</div>
+                <div style="font-size:12px;color:rgba(0,0,0,.6);margin-top:2px;">Total Order</div>
             </div>
         </div>
     </div>
-    <div class="card" style="margin-bottom:0; background: linear-gradient(135deg,rgba(16,185,129,.25),rgba(16,185,129,.1)); border-color:rgba(16,185,129,.3);">
+    <div class="card" style="margin-bottom:0; background: var(--primary-dark); border-color: #0d5a2d;">
         <div style="display:flex;align-items:center;gap:16px;">
-            <div style="width:52px;height:52px;background:rgba(16,185,129,.3);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;">💰</div>
+            <div style="width:52px;height:52px;background:rgba(255,255,255,.2);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;color:#fff;"><i class="bi bi-cash-stack"></i></div>
             <div>
-                <div style="font-size:22px;font-weight:800;color:#6ee7b7;">Rp {{ number_format($totalRevenue, 0, ',', '.') }}</div>
-                <div style="font-size:12px;color:#94a3b8;margin-top:2px;">Total Pendapatan</div>
+                <div style="font-size:22px;font-weight:800;color:#fff;">Rp {{ number_format($totalRevenue, 0, ',', '.') }}</div>
+                <div style="font-size:12px;color:rgba(255,255,255,.8);margin-top:2px;">Total Pendapatan</div>
             </div>
         </div>
     </div>
@@ -38,18 +38,18 @@
     {{-- Order Status --}}
     <div class="card" style="margin-bottom:0;">
         <div class="card-header">
-            <div class="card-title">📊 Status Order</div>
+            <div class="card-title"><i class="bi bi-bar-chart-line"></i> Status Order</div>
         </div>
         <div style="display:grid;gap:12px;">
             <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.2);border-radius:10px;">
                 <div style="display:flex;align-items:center;gap:10px;font-size:14px;">
-                    <span style="color:#fbbf24;">⏳</span> Baru (Pending)
+                    <span style="color:var(--secondary);"><i class="bi bi-hourglass-split"></i></span> Baru (Pending)
                 </div>
                 <span class="badge badge-warning">{{ $pendingOrders }}</span>
             </div>
             <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.2);border-radius:10px;">
                 <div style="display:flex;align-items:center;gap:10px;font-size:14px;">
-                    <span style="color:#34d399;">✅</span> Sudah Diambil (Selesai)
+                    <span style="color:var(--primary);"><i class="bi bi-check-circle-fill"></i></span> Sudah Diambil (Selesai)
                 </div>
                 <span class="badge badge-success">{{ $doneOrders }}</span>
             </div>
@@ -59,7 +59,7 @@
     {{-- Recent Orders --}}
     <div class="card" style="margin-bottom:0;">
         <div class="card-header">
-            <div class="card-title">🕐 Order Terbaru</div>
+            <div class="card-title"><i class="bi bi-clock-history"></i> Order Terbaru</div>
             <a href="{{ route('orders.index') }}" class="btn btn-secondary btn-sm">Lihat Semua</a>
         </div>
         @if($recentOrders->isEmpty())
@@ -67,9 +67,9 @@
         @else
             <div style="display:grid;gap:10px;">
                 @foreach($recentOrders as $order)
-                <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:rgba(255,255,255,.03);border-radius:8px;">
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:#f8fafc;border:1px solid var(--border);border-radius:8px;">
                     <div>
-                        <div style="font-size:13px;font-weight:600;color:#e2e8f0;">{{ $order->order_code }}</div>
+                        <div style="font-size:13px;font-weight:600;color:var(--text);">{{ $order->order_code }}</div>
                         <div style="font-size:11px;color:#94a3b8;margin-top:2px;">{{ $order->customer->customer_name ?? '-' }}</div>
                     </div>
                     <div style="text-align:right;">
@@ -85,7 +85,7 @@
 
 @if(in_array(auth()->user()->id_level, [1, 2])) {{-- Admin & Operator --}} {{-- Quick Actions --}}
 <div class="card" style="margin-top:24px;">
-    <div class="card-title" style="margin-bottom:16px;">⚡ Aksi Cepat</div>
+    <div class="card-title" style="margin-bottom:16px;"><i class="bi bi-lightning-charge"></i> Aksi Cepat</div>
     <div style="display:flex;gap:12px;flex-wrap:wrap;">
 
     @if(in_array(auth()->user()->id_level, [2])) {{-- Operator --}}

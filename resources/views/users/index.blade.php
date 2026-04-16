@@ -5,7 +5,7 @@
 @section('content')
 <div class="card">
     <div class="card-header">
-        <div class="card-title">👥 Daftar Pengguna Sistem</div>
+        <div class="card-title"><i class="bi bi-people"></i> Daftar Pengguna Sistem</div>
         <a href="{{ route('users.create') }}" class="btn btn-primary">
             <i class="fas fa-plus"></i> Tambah User Baru
         </a>
@@ -43,7 +43,7 @@
                         <td style="color:#64748b;">{{ $users->firstItem() + $i }}</td>
                         <td>
                             <div style="display:flex;align-items:center;gap:10px;">
-                                <div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#8b5cf6,#06b6d4);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;">
+                                <div style="width:34px;height:34px;border-radius:50%;background:var(--secondary);color:var(--primary-dark);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;">
                                     {{ strtoupper(substr($u->name, 0, 1)) }}
                                 </div>
                                 <span style="font-weight:600;">{{ $u->name }}</span>
@@ -80,7 +80,7 @@
                 @empty
                     <tr>
                         <td colspan="6" style="text-align:center;padding:40px;color:#64748b;">
-                            <div style="font-size:36px;margin-bottom:10px;">🛡️</div>
+                            <div style="font-size:36px;margin-bottom:10px;"><i class="bi bi-shield-lock"></i></div>
                             Belum ada data user
                         </td>
                     </tr>
