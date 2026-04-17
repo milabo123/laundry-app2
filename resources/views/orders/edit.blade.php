@@ -35,7 +35,7 @@
                 </a>
             </div>
 
-            <form method="POST" action="{{ route('orders.update', $order) }}">
+            <form method="POST" action="{{ route('orders.update', $order) }}" id="orderForm">
                 @csrf @method('PUT')
 
                 <div class="grid grid-2">
@@ -68,8 +68,11 @@
                     </div>
                     <div class="form-group">
                         <label class="form-label">Uang Bayar (Rp)</label>
-                        <input type="number" name="order_pay" class="form-control"
+                        <input type="number" name="order_pay" id="order_pay" class="form-control"
                             value="{{ old('order_pay', $order->order_pay) }}" min="0" oninput="calcTotal()">
+                        <div id="pay-error" style="display:none;margin-top:6px;font-size:12px;color:#dc2626;font-weight:600;">
+                            <i class="fas fa-exclamation-circle"></i> Uang bayar kurang dari total tagihan.
+                        </div>
                     </div>
                 </div>
 
@@ -96,10 +99,22 @@
         <div class="card">
             <div class="card-title" style="margin-bottom:16px;"><i class="bi bi-cash-stack"></i> Ringkasan</div>
             <div id="summary-list" style="display:grid;gap:8px;margin-bottom:16px;"></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                <span style="color:var(--text-muted);">Subtotal</span>
+                <div id="subtotal-display" style="font-size:16px;font-weight:600;color:var(--text);">Rp 0</div>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                <span style="color:var(--text-muted);">Pajak (10%)</span>
+                <div id="tax-display" style="font-size:16px;font-weight:600;color:#f59e0b;">Rp 0</div>
+            </div>
             <hr class="divider">
             <div style="display:flex;justify-content:space-between;align-items:center;">
                 <span style="color:var(--text-muted);">Total</span>
                 <div id="total-display">Rp 0</div>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;">
+                <span style="color:var(--text-muted);font-size:14px;">Kembalian</span>
+                <div id="change-display" style="font-size:18px;font-weight:700;color:var(--secondary);">Rp 0</div>
             </div>
         </div>
     </div>
@@ -171,10 +186,56 @@ function calcTotal() {
             row.querySelector('.svc-subtotal').textContent = '';
         }
     });
-    document.getElementById('total-display').textContent = 'Rp ' + grand.toLocaleString('id-ID');
+    document.getElementById('subtotal-display').textContent = 'Rp ' + grand.toLocaleString('id-ID');
+    const tax = Math.round(grand * 0.1);
+    const grandTotal = grand + tax;
+    document.getElementById('tax-display').textContent = 'Rp ' + tax.toLocaleString('id-ID');
+    document.getElementById('total-display').textContent = 'Rp ' + grandTotal.toLocaleString('id-ID');
+
+    const payInput = document.getElementById('order_pay');
+    const pay = parseInt(payInput.value) || 0;
+    const change = Math.max(0, pay - grandTotal);
+    document.getElementById('change-display').textContent = 'Rp ' + change.toLocaleString('id-ID');
+
+    // Validate pay
+    const payError = document.getElementById('pay-error');
+    const submitBtn = document.querySelector('button[type="submit"]');
+    const isInsufficient = payInput.value !== '' && pay < grandTotal;
+
+    payInput.style.borderColor = isInsufficient ? '#dc2626' : '';
+    payError.style.display = isInsufficient ? 'block' : 'none';
+    if(submitBtn) {
+        submitBtn.disabled = isInsufficient;
+        submitBtn.style.opacity = isInsufficient ? '0.5' : '';
+        submitBtn.style.cursor = isInsufficient ? 'not-allowed' : '';
+    }
+
     document.getElementById('summary-list').innerHTML = html ||
         '<div style="color:#64748b;font-size:13px;text-align:center;">Belum ada layanan</div>';
 }
+
+// Block submission
+document.getElementById('orderForm').addEventListener('submit', function (e) {
+    const pay = parseInt(document.getElementById('order_pay').value) || 0;
+    const rows = document.querySelectorAll('.detail-line');
+    let grand = 0;
+    rows.forEach(row => {
+        const sel = row.querySelector('.svc-select');
+        const qty = parseInt(row.querySelector('.svc-qty').value) || 0;
+        const opt = sel.options[sel.selectedIndex];
+        const price = parseInt(opt?.dataset?.price || 0);
+        grand += Math.round(price * (qty / 1000));
+    });
+    const grandTotal = grand + Math.round(grand * 0.1);
+
+    if (pay < grandTotal) {
+        e.preventDefault();
+        const payInput = document.getElementById('order_pay');
+        payInput.style.borderColor = '#dc2626';
+        document.getElementById('pay-error').style.display = 'block';
+        payInput.focus();
+    }
+});
 
 // Load existing details
 @foreach($order->details as $d)

@@ -83,7 +83,7 @@
                 @error('services')<div class="alert alert-danger">{{ $message }}</div>@enderror
 
                 <div style="margin-top:20px;">
-                    <button type="submit" class="btn btn-primary">
+                    <button type="submit" class="btn btn-primary" id="submitBtn">
                         <i class="fas fa-save"></i> Simpan Order
                     </button>
                 </div>
@@ -96,6 +96,14 @@
         <div class="card">
             <div class="card-title" style="margin-bottom:16px;"><i class="bi bi-cash-stack"></i> Ringkasan Order</div>
             <div id="summary-list" style="display:grid;gap:8px;margin-bottom:16px;"></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+                <span style="color:#94a3b8;font-size:14px;">Subtotal</span>
+                <div id="subtotal-display" style="font-size:16px;font-weight:600;color:var(--text);">Rp 0</div>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+                <span style="color:#94a3b8;font-size:14px;">Pajak (10%)</span>
+                <div id="tax-display" style="font-size:16px;font-weight:600;color:#f59e0b;">Rp 0</div>
+            </div>
             <hr class="divider">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
                 <span style="color:#94a3b8;font-size:14px;">Total</span>
@@ -103,8 +111,11 @@
             </div>
             <div class="form-group" style="margin-bottom:12px;">
                 <label style="font-size:13px;color:var(--text-muted);">Uang Bayar (Rp)</label>
-                <input type="number" name="order_pay" id="order_pay" class="form-control"
+                <input type="number" name="order_pay" id="order_pay" class="form-control" form="orderForm"
                     placeholder="0" min="0" oninput="calcTotal()" style="text-align:right;">
+                <div id="pay-error" style="display:none;margin-top:6px;font-size:12px;color:#dc2626;font-weight:600;">
+                    <i class="fas fa-exclamation-circle"></i> Uang bayar kurang dari total tagihan.
+                </div>
             </div>
             <div style="display:flex;align-items:center;justify-content:space-between;">
                 <span style="color:#94a3b8;font-size:14px;">Kembalian</span>
@@ -119,6 +130,7 @@
 <script>
 const services = @json($services);
 let rowIndex = 0;
+let currentGrandTotal = 0;
 
 function addRow(svcId = '', qty = 1, notes = '') {
     const container = document.getElementById('detail-rows');
@@ -194,15 +206,49 @@ function calcTotal() {
         }
     });
 
-    document.getElementById('total-display').textContent = 'Rp ' + grand.toLocaleString('id-ID');
+    document.getElementById('subtotal-display').textContent = 'Rp ' + grand.toLocaleString('id-ID');
 
-    const pay = parseInt(document.getElementById('order_pay').value) || 0;
-    const change = Math.max(0, pay - grand);
+    const tax = Math.round(grand * 0.1);
+    currentGrandTotal = grand + tax;
+    document.getElementById('tax-display').textContent = 'Rp ' + tax.toLocaleString('id-ID');
+    document.getElementById('total-display').textContent = 'Rp ' + currentGrandTotal.toLocaleString('id-ID');
+
+    const payInput = document.getElementById('order_pay');
+    const pay = parseInt(payInput.value) || 0;
+    const change = Math.max(0, pay - currentGrandTotal);
     document.getElementById('change-display').textContent = 'Rp ' + change.toLocaleString('id-ID');
+
+    // Validate pay amount and update UI feedback
+    const payError = document.getElementById('pay-error');
+    const submitBtn = document.getElementById('submitBtn');
+    const hasPay = payInput.value !== '';
+    const isInsufficient = hasPay && pay < currentGrandTotal;
+
+    payInput.style.borderColor = isInsufficient ? '#dc2626' : '';
+    payError.style.display = isInsufficient ? 'block' : 'none';
+    submitBtn.disabled = isInsufficient;
+    submitBtn.style.opacity = isInsufficient ? '0.5' : '';
+    submitBtn.style.cursor = isInsufficient ? 'not-allowed' : '';
 
     document.getElementById('summary-list').innerHTML = summaryHtml ||
         '<div style="color:#64748b;font-size:13px;text-align:center;">Belum ada layanan dipilih</div>';
 }
+
+// Block submission if pay is empty or insufficient
+document.getElementById('orderForm').addEventListener('submit', function (e) {
+    const pay = parseInt(document.getElementById('order_pay').value) || 0;
+    const payInput = document.getElementById('order_pay');
+    const payError = document.getElementById('pay-error');
+
+    if (pay < currentGrandTotal) {
+        e.preventDefault();
+        payInput.style.borderColor = '#dc2626';
+        payError.style.display = 'block';
+        payInput.focus();
+        // Scroll to summary panel so user sees the error
+        payInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+});
 
 // Add first row on load
 addRow();

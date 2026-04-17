@@ -72,13 +72,20 @@ class TransOrderController extends Controller
             ]);
         }
 
-        $orderPay    = $request->order_pay ?? 0;
-        $orderChange = max(0, $orderPay - $total);
+        $tax         = (int) round($total * 0.1);
+        $grandTotal  = $total + $tax;
+
+        $request->validate([
+            'order_pay' => 'required|integer|min:' . $grandTotal,
+        ]);
+
+        $orderPay    = (int) $request->order_pay;
+        $orderChange = max(0, $orderPay - $grandTotal);
 
         $order->update([
-            'total'        => $total,
-            'order_pay'    => $orderPay ?: null,
-            'order_change' => $orderChange ?: null,
+            'total'        => $grandTotal,
+            'order_pay'    => $orderPay > 0 ? $orderPay : null,
+            'order_change' => $orderPay > 0 ? $orderChange : null,
         ]);
 
         return redirect()->route('orders.index')
@@ -130,17 +137,24 @@ class TransOrderController extends Controller
             ]);
         }
 
-        $orderPay    = $request->order_pay ?? 0;
-        $orderChange = max(0, $orderPay - $total);
+        $tax         = (int) round($total * 0.1);
+        $grandTotal  = $total + $tax;
+
+        $request->validate([
+            'order_pay' => 'required|integer|min:' . $grandTotal,
+        ]);
+
+        $orderPay    = (int) $request->order_pay;
+        $orderChange = max(0, $orderPay - $grandTotal);
 
         $order->update([
             'id_customer'    => $request->id_customer,
             'order_date'     => $request->order_date,
             'order_end_date' => $request->order_end_date,
             'order_status'   => $request->order_status,
-            'order_pay'      => $orderPay ?: null,
-            'order_change'   => $orderChange ?: null,
-            'total'          => $total,
+            'order_pay'      => $orderPay > 0 ? $orderPay : null,
+            'order_change'   => $orderPay > 0 ? $orderChange : null,
+            'total'          => $grandTotal,
         ]);
 
         return redirect()->route('orders.show', $order)
