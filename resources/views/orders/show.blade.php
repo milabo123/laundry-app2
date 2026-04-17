@@ -25,12 +25,33 @@
             </div>
             <div class="detail-row">
                 <div class="detail-label">Pelanggan</div>
-                <div class="detail-value" style="font-weight:600;">{{ $order->customer->customer_name ?? '-' }}</div>
+                <div class="detail-value" style="font-weight:600;">
+                    @if($order->id_customer)
+                        {{ $order->customer->customer_name }}
+                        <span class="badge badge-success" style="font-size:10px;margin-left:8px;">Member</span>
+                    @else
+                        {{ $order->customer_name }}
+                        <span class="badge badge-secondary" style="font-size:10px;margin-left:8px;">Non-Member</span>
+                    @endif
+                </div>
             </div>
             <div class="detail-row">
                 <div class="detail-label">No Telepon</div>
-                <div class="detail-value">{{ $order->customer->phone ?? '-' }}</div>
+                <div class="detail-value">
+                    {{ $order->id_customer ? ($order->customer->phone ?? '-') : ($order->customer_phone ?? '-') }}
+                </div>
             </div>
+            @if(!$order->id_customer && $order->customer_address)
+            <div class="detail-row">
+                <div class="detail-label">Alamat</div>
+                <div class="detail-value">{{ $order->customer_address }}</div>
+            </div>
+            @elseif($order->id_customer && $order->customer->address)
+            <div class="detail-row">
+                <div class="detail-label">Alamat</div>
+                <div class="detail-value">{{ $order->customer->address }}</div>
+            </div>
+            @endif
             <div class="detail-row">
                 <div class="detail-label">Tanggal Order</div>
                 <div class="detail-value">{{ $order->order_date->format('d M Y') }}</div>
@@ -99,20 +120,38 @@
         <div class="card" style="background:#f8fafc; border-color:var(--border);">
             <div class="card-title" style="margin-bottom:20px;"><i class="bi bi-cash-stack"></i> Ringkasan Pembayaran</div>
 
-            @foreach($order->details as $d)
-            <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px;">
-                <span style="color:#94a3b8;">{{ $d->service->service_name ?? '-' }} x {{ $d->qty }}g</span>
-                <span>Rp {{ number_format($d->subtotal, 0, ',', '.') }}</span>
-            </div>
-            @endforeach
-
-            <hr class="divider">
-
-            <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
-                <span style="font-weight:600;">Total</span>
-                <span style="font-size:22px;font-weight:800;color:var(--primary);font-family:monospace;">
-                    Rp {{ number_format($order->total, 0, ',', '.') }}
-                </span>
+            <div style="background:rgba(22,163,74,.03);border-radius:12px;padding:14px;margin-bottom:16px;">
+                @php
+                    $itemSubtotal = $order->details->sum('subtotal');
+                    $tax = (int)round($itemSubtotal * 0.1);
+                    $subtotalWithTax = $itemSubtotal + $tax;
+                @endphp
+                <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px;">
+                    <span style="color:#94a3b8;">Subtotal Item</span>
+                    <span style="font-weight:500;">Rp {{ number_format($itemSubtotal, 0, ',', '.') }}</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px;">
+                    <span style="color:#94a3b8;">Pajak (10%)</span>
+                    <span style="font-weight:500;">Rp {{ number_format($tax, 0, ',', '.') }}</span>
+                </div>
+                @if($order->discount_amount > 0)
+                <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px;color:var(--danger);font-weight:600;">
+                    <span>
+                        Potongan Diskon
+                        @if($order->id_voucher)
+                            <br><small style="font-weight: normal; color: #94a3b8;">(Voucher: {{ $order->voucher->code }})</small>
+                        @endif
+                    </span>
+                    <span>-Rp {{ number_format($order->discount_amount, 0, ',', '.') }}</span>
+                </div>
+                @endif
+                <hr style="border:none;border-top:1px dashed #e2e8f0;margin:10px 0;">
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-weight:700;font-size:14px;">Total Akhir</span>
+                    <span style="font-size:22px;font-weight:800;color:var(--primary);font-family:monospace;">
+                        Rp {{ number_format($order->total, 0, ',', '.') }}
+                    </span>
+                </div>
             </div>
 
             @if($order->order_pay)

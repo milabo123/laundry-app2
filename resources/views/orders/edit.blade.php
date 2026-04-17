@@ -30,24 +30,65 @@
         <div class="card">
             <div class="card-header">
                 <div class="card-title"><i class="bi bi-pencil-square"></i> Edit Order {{ $order->order_code }}</div>
-                <a href="{{ route('orders.show', $order) }}" class="btn btn-secondary btn-sm">
-                    <i class="fas fa-arrow-left"></i> Kembali
-                </a>
+                <div style="display:flex;gap:8px;">
+                    <a href="{{ route('customers.create') }}" class="btn btn-success btn-sm">
+                        <i class="fas fa-user-plus"></i> Tambah Member
+                    </a>
+                    <a href="{{ route('orders.show', $order) }}" class="btn btn-secondary btn-sm">
+                        <i class="fas fa-arrow-left"></i> Kembali
+                    </a>
+                </div>
             </div>
 
             <form method="POST" action="{{ route('orders.update', $order) }}" id="orderForm">
                 @csrf @method('PUT')
 
                 <div class="grid grid-2">
-                    <div class="form-group">
-                        <label class="form-label">Pelanggan <span style="color:#ef4444;">*</span></label>
-                        <select name="id_customer" class="form-control">
+                    <div class="form-group" style="grid-column: span 2;">
+                        <label class="form-label">Tipe Pelanggan <span style="color:#ef4444;">*</span></label>
+                        @php $type = $order->id_customer ? 'member' : 'customer'; @endphp
+                        <div style="display:flex;gap:20px;margin-top:8px;">
+                            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+                                <input type="radio" name="customer_type" value="member" {{ old('customer_type', $type) == 'member' ? 'checked' : '' }} onchange="toggleCustomerFields()"> 
+                                <span style="font-weight:600;">Member</span>
+                            </label>
+                            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+                                <input type="radio" name="customer_type" value="customer" {{ old('customer_type', $type) == 'customer' ? 'checked' : '' }} onchange="toggleCustomerFields()"> 
+                                <span style="font-weight:600;">Customer (Non-Member)</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group" id="member-select-wrapper" style="display: {{ old('customer_type', $type) == 'member' ? 'block' : 'none' }};">
+                        <label class="form-label">Pilih Member <span style="color:#ef4444;">*</span></label>
+                        <select name="id_customer" class="form-control {{ $errors->has('id_customer') ? 'is-invalid' : '' }}">
+                            <option value="">-- Pilih Pelanggan --</option>
                             @foreach($customers as $c)
                                 <option value="{{ $c->id }}" {{ old('id_customer', $order->id_customer) == $c->id ? 'selected' : '' }}>
-                                    {{ $c->customer_name }}
+                                    {{ $c->customer_name }} ({{ $c->phone }})
                                 </option>
                             @endforeach
                         </select>
+                        @error('id_customer')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                    </div>
+
+                    <div id="customer-inputs-wrapper" style="display: {{ old('customer_type', $type) == 'customer' ? 'contents' : 'none' }};">
+                        <div class="form-group">
+                            <label class="form-label">Nama Customer <span style="color:#ef4444;">*</span></label>
+                            <input type="text" name="customer_name" class="form-control {{ $errors->has('customer_name') ? 'is-invalid' : '' }}" 
+                                value="{{ old('customer_name', $order->customer_name) }}" placeholder="Nama Lengkap">
+                            @error('customer_name')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">No. Telepon</label>
+                            <input type="text" name="customer_phone" class="form-control {{ $errors->has('customer_phone') ? 'is-invalid' : '' }}" 
+                                value="{{ old('customer_phone', $order->customer_phone) }}" placeholder="08xxxxxxxx">
+                            @error('customer_phone')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                        </div>
+                        <div class="form-group" style="grid-column: span 2;">
+                            <label class="form-label">Alamat</label>
+                            <textarea name="customer_address" class="form-control" rows="2" placeholder="Alamat Lengkap (Opsional)">{{ old('customer_address', $order->customer_address) }}</textarea>
+                        </div>
                     </div>
                     <div class="form-group">
                         <label class="form-label">Status</label>
@@ -125,6 +166,20 @@
 <script>
 const services = @json($services);
 let rowIndex = 0;
+
+function toggleCustomerFields() {
+    const type = document.querySelector('input[name="customer_type"]:checked').value;
+    const memberWrapper = document.getElementById('member-select-wrapper');
+    const customerWrapper = document.getElementById('customer-inputs-wrapper');
+    
+    if (type === 'member') {
+        memberWrapper.style.display = 'block';
+        customerWrapper.style.display = 'none';
+    } else {
+        memberWrapper.style.display = 'none';
+        customerWrapper.style.display = 'contents';
+    }
+}
 
 function addRow(svcId = '', qty = 1, notes = '') {
     const container = document.getElementById('detail-rows');

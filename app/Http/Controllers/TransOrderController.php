@@ -17,8 +17,11 @@ class TransOrderController extends Controller
         $status = $request->get('status');
 
         $orders = TransOrder::with('customer')
-            ->when($search, fn($q) => $q->where('order_code', 'like', "%$search%")
-                ->orWhereHas('customer', fn($q2) => $q2->where('customer_name', 'like', "%$search%")))
+            ->when($search, function($q) use ($search) {
+                $q->where('order_code', 'like', "%$search%")
+                  ->orWhere('customer_name', 'like', "%$search%")
+                  ->orWhereHas('customer', fn($q2) => $q2->where('customer_name', 'like', "%$search%"));
+            })
             ->when($status !== null && $status !== '', fn($q) => $q->where('order_status', $status))
             ->orderByDesc('created_at')
             ->paginate(10)
@@ -29,7 +32,7 @@ class TransOrderController extends Controller
 
     public function create()
     {
-        $customers = Customer::orderBy('customer_name')->get();
+        $customers = Customer::withCount('orders')->orderBy('customer_name')->get();
         $services  = TypeOfService::orderBy('service_name')->get();
         return view('orders.create', compact('customers', 'services'));
     }
@@ -37,10 +40,14 @@ class TransOrderController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'id_customer'  => 'required|exists:customers,id',
-            'order_date'   => 'required|date',
+            'customer_type' => 'required|in:member,customer',
+            'id_customer'   => 'required_if:customer_type,member|nullable|exists:customers,id',
+            'customer_name' => 'required_if:customer_type,customer|nullable|string|max:50',
+            'customer_phone' => 'nullable|string|max:15',
+            'customer_address' => 'nullable|string',
+            'order_date'    => 'required|date',
             'order_end_date' => 'nullable|date|after_or_equal:order_date',
-            'services'     => 'required|array|min:1',
+            'services'      => 'required|array|min:1',
             'services.*.id_service' => 'required|exists:type_of_service,id',
             'services.*.qty'        => 'required|integer|min:1',
             'services.*.notes'      => 'nullable|string',
@@ -49,14 +56,27 @@ class TransOrderController extends Controller
         $orderCode = 'ORD-' . strtoupper(Str::random(8));
         $total = 0;
 
-        $order = TransOrder::create([
-            'id_customer'    => $request->id_customer,
+        $orderData = [
             'order_code'     => $orderCode,
             'order_date'     => $request->order_date,
             'order_end_date' => $request->order_end_date,
             'order_status'   => 0,
             'total'          => 0,
-        ]);
+        ];
+
+        if ($request->customer_type === 'member') {
+            $orderData['id_customer'] = $request->id_customer;
+            $orderData['customer_name'] = null;
+            $orderData['customer_phone'] = null;
+            $orderData['customer_address'] = null;
+        } else {
+            $orderData['id_customer'] = null;
+            $orderData['customer_name'] = $request->customer_name;
+            $orderData['customer_phone'] = $request->customer_phone;
+            $orderData['customer_address'] = $request->customer_address;
+        }
+
+        $order = TransOrder::create($orderData);
 
         foreach ($request->services as $svc) {
             $service  = TypeOfService::find($svc['id_service']);
@@ -73,7 +93,41 @@ class TransOrderController extends Controller
         }
 
         $tax         = (int) round($total * 0.1);
-        $grandTotal  = $total + $tax;
+        $subtotalWithTax = $total + $tax;
+
+        // --- NEW MEMBER & VOUCHER LOGIC ---
+        $discountPercent = 0;
+        $voucherId = null;
+
+        // 1. New Member Discount (5% on first transaction)
+        if ($request->customer_type === 'member' && $request->id_customer) {
+            $isFirstOrder = !TransOrder::where('id_customer', $request->id_customer)->exists();
+            if ($isFirstOrder) {
+                $discountPercent += 5;
+            }
+        }
+
+        // 2. Voucher Discount
+        if ($request->voucher_code) {
+            $voucher = \App\Models\Voucher::where('code', strtoupper($request->voucher_code))->first();
+            if ($voucher && $voucher->is_active && (!$voucher->expires_at || !$voucher->expires_at->isPast())) {
+                $canUse = true;
+                if ($request->customer_type === 'member') {
+                    $canUse = !TransOrder::where('id_customer', $request->id_customer)->where('id_voucher', $voucher->id)->exists();
+                } elseif ($request->customer_phone) {
+                    $canUse = !TransOrder::where('customer_phone', $request->customer_phone)->where('id_voucher', $voucher->id)->exists();
+                }
+
+                if ($canUse) {
+                    $discountPercent += $voucher->discount_percent;
+                    $voucherId = $voucher->id;
+                }
+            }
+        }
+
+        $discountAmount = (int) round($subtotalWithTax * ($discountPercent / 100));
+        $grandTotal     = $subtotalWithTax - $discountAmount;
+        // ----------------------------------
 
         $request->validate([
             'order_pay' => 'required|integer|min:' . $grandTotal,
@@ -83,9 +137,11 @@ class TransOrderController extends Controller
         $orderChange = max(0, $orderPay - $grandTotal);
 
         $order->update([
-            'total'        => $grandTotal,
-            'order_pay'    => $orderPay > 0 ? $orderPay : null,
-            'order_change' => $orderPay > 0 ? $orderChange : null,
+            'total'           => $grandTotal,
+            'id_voucher'      => $voucherId,
+            'discount_amount' => $discountAmount,
+            'order_pay'       => $orderPay > 0 ? $orderPay : null,
+            'order_change'    => $orderPay > 0 ? $orderChange : null,
         ]);
 
         return redirect()->route('orders.index')
@@ -109,7 +165,11 @@ class TransOrderController extends Controller
     public function update(Request $request, TransOrder $order)
     {
         $request->validate([
-            'id_customer'   => 'required|exists:customers,id',
+            'customer_type' => 'required|in:member,customer',
+            'id_customer'   => 'required_if:customer_type,member|nullable|exists:customers,id',
+            'customer_name' => 'required_if:customer_type,customer|nullable|string|max:50',
+            'customer_phone' => 'nullable|string|max:15',
+            'customer_address' => 'nullable|string',
             'order_date'    => 'required|date',
             'order_end_date' => 'nullable|date',
             'order_status'  => 'required|integer|between:0,1',
@@ -147,15 +207,28 @@ class TransOrderController extends Controller
         $orderPay    = (int) $request->order_pay;
         $orderChange = max(0, $orderPay - $grandTotal);
 
-        $order->update([
-            'id_customer'    => $request->id_customer,
+        $orderUpdateData = [
             'order_date'     => $request->order_date,
             'order_end_date' => $request->order_end_date,
             'order_status'   => $request->order_status,
             'order_pay'      => $orderPay > 0 ? $orderPay : null,
             'order_change'   => $orderPay > 0 ? $orderChange : null,
             'total'          => $grandTotal,
-        ]);
+        ];
+
+        if ($request->customer_type === 'member') {
+            $orderUpdateData['id_customer'] = $request->id_customer;
+            $orderUpdateData['customer_name'] = null;
+            $orderUpdateData['customer_phone'] = null;
+            $orderUpdateData['customer_address'] = null;
+        } else {
+            $orderUpdateData['id_customer'] = null;
+            $orderUpdateData['customer_name'] = $request->customer_name;
+            $orderUpdateData['customer_phone'] = $request->customer_phone;
+            $orderUpdateData['customer_address'] = $request->customer_address;
+        }
+
+        $order->update($orderUpdateData);
 
         return redirect()->route('orders.show', $order)
             ->with('success', 'Order berhasil diperbarui.');

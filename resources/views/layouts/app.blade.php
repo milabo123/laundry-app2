@@ -297,6 +297,9 @@
                 <a href="{{ route('services.index') }}" class="nav-item {{ request()->routeIs('services.*') ? 'active' : '' }}">
                     <i class="fas fa-concierge-bell"></i> Jenis Layanan
                 </a>
+                <a href="{{ route('vouchers.index') }}" class="nav-item {{ request()->routeIs('vouchers.*') ? 'active' : '' }}">
+                    <i class="bi bi-ticket-perforated"></i> Manajemen Voucher
+                </a>
             </div>
             @endif
 
@@ -351,10 +354,7 @@
                 <div class="topbar-title">@yield('page-title', 'Dashboard')</div>
                 <div class="topbar-breadcrumb">LaundryLaundryan &rsaquo; @yield('page-title', 'Dashboard')</div>
             </div>
-            <div style="font-size: 13px; color: var(--text-muted);">
-                <i class="fas fa-clock"></i>
-                {{ now()->format('d M Y, H:i') }} WIB
-            </div>
+            
         </header>
 
         <main class="page-content">

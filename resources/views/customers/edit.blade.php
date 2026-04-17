@@ -1,11 +1,11 @@
 @extends('layouts.app')
-@section('title', 'Edit Pelanggan')
-@section('page-title', 'Edit Pelanggan')
+@section('title', 'Edit Member')
+@section('page-title', 'Edit Member')
 
 @section('content')
 <div class="card" style="max-width:600px;">
     <div class="card-header">
-        <div class="card-title"><i class="bi bi-pencil-square"></i> Edit Data Pelanggan</div>
+        <div class="card-title"><i class="bi bi-pencil-square"></i> Edit Data Member</div>
         <a href="{{ route('customers.index') }}" class="btn btn-secondary btn-sm">
             <i class="fas fa-arrow-left"></i> Kembali
         </a>
@@ -14,7 +14,7 @@
     <form method="POST" action="{{ route('customers.update', $customer) }}">
         @csrf @method('PUT')
         <div class="form-group">
-            <label class="form-label">Nama Pelanggan <span style="color:#ef4444;">*</span></label>
+            <label class="form-label">Nama Member <span style="color:#ef4444;">*</span></label>
             <input type="text" name="customer_name" class="form-control {{ $errors->has('customer_name') ? 'is-invalid' : '' }}"
                 value="{{ old('customer_name', $customer->customer_name) }}" placeholder="Masukkan nama lengkap">
             @error('customer_name')<div class="invalid-feedback">{{ $message }}</div>@enderror

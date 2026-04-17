@@ -1,13 +1,13 @@
 @extends('layouts.app')
-@section('title', 'Data Pelanggan')
-@section('page-title', 'Data Pelanggan')
+@section('title', 'Data Member')
+@section('page-title', 'Data Member')
 
 @section('content')
 <div class="card">
     <div class="card-header">
-        <div class="card-title"><i class="bi bi-people"></i> Daftar Pelanggan</div>
+        <div class="card-title"><i class="bi bi-people"></i> Daftar Member</div>
         <a href="{{ route('customers.create') }}" class="btn btn-primary">
-            <i class="fas fa-user-plus"></i> Tambah Pelanggan
+            <i class="fas fa-user-plus"></i> Tambah Member
         </a>
     </div>
 
@@ -31,7 +31,7 @@
             <thead>
                 <tr>
                     <th>#</th>
-                    <th>Nama Pelanggan</th>
+                    <th>Nama Member</th>
                     <th>No Telepon</th>
                     <th>Alamat</th>
                     <th>Terdaftar</th>
@@ -59,7 +59,7 @@
                                     <i class="fas fa-edit"></i> Edit
                                 </a>
                                 <form method="POST" action="{{ route('customers.destroy', $c) }}"
-                                    onsubmit="return confirm('Hapus pelanggan {{ $c->customer_name }}?')">
+                                    onsubmit="return confirm('Hapus Member {{ $c->customer_name }}?')">
                                     @csrf @method('DELETE')
                                     <button type="submit" class="btn btn-danger btn-sm">
                                         <i class="fas fa-trash"></i>
@@ -72,7 +72,7 @@
                     <tr>
                         <td colspan="6" style="text-align:center;padding:40px;color:#64748b;">
                             <div style="font-size:36px;margin-bottom:10px;"><i class="bi bi-person"></i></div>
-                            Belum ada data pelanggan
+                            Belum ada data Member
                         </td>
                     </tr>
                 @endforelse

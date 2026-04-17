@@ -52,13 +52,23 @@
                         <td>
                             <span style="font-weight:700;color:var(--primary-dark);font-family:monospace;font-size:13px;">{{ $o->order_code }}</span>
                         </td>
-                        <td style="font-weight:500;">{{ $o->customer->customer_name ?? '-' }}</td>
+                        <td style="font-weight:500;">
+                            {{ $o->id_customer ? ($o->customer->customer_name ?? '-') : ($o->customer_name ?? '-') }}
+                            @if(!$o->id_customer)
+                                <span style="font-size:10px; color:#94a3b8; display:block; font-weight:400;">(Non-Member)</span>
+                            @endif
+                        </td>
                         <td style="color:#94a3b8;font-size:13px;">{{ $o->order_date->format('d M Y') }}</td>
                         <td style="color:#94a3b8;font-size:13px;">
                             {{ $o->order_end_date ? $o->order_end_date->format('d M Y') : '-' }}
                         </td>
                         <td style="font-weight:700;color:var(--primary);">
                             Rp {{ number_format($o->total, 0, ',', '.') }}
+                            @if($o->discount_amount > 0)
+                                <div style="font-size:10px;color:var(--danger);margin-top:2px;">
+                                    <i class="fas fa-tag"></i> Discount Applied
+                                </div>
+                            @endif
                         </td>
                         <td><span class="badge badge-{{ $o->status_color }}">{{ $o->status_label }}</span></td>
                         <td>

@@ -35,28 +35,65 @@
         <div class="card">
             <div class="card-header">
                 <div class="card-title"><i class="bi bi-clipboard-plus"></i> Form Buat Order</div>
-                <a href="{{ route('orders.index') }}" class="btn btn-secondary btn-sm">
-                    <i class="fas fa-arrow-left"></i> Kembali
-                </a>
+                <div style="display:flex;gap:8px;">
+                    <a href="{{ route('customers.create') }}" class="btn btn-success btn-sm">
+                        <i class="fas fa-user-plus"></i> Tambah Member
+                    </a>
+                    <a href="{{ route('orders.index') }}" class="btn btn-secondary btn-sm">
+                        <i class="fas fa-arrow-left"></i> Kembali
+                    </a>
+                </div>
             </div>
 
             <form method="POST" action="{{ route('orders.store') }}" id="orderForm">
                 @csrf
 
                 <div class="grid grid-2">
-                    <div class="form-group">
-                        <label class="form-label">Pelanggan <span style="color:#ef4444;">*</span></label>
-                        <select name="id_customer" class="form-control {{ $errors->has('id_customer') ? 'is-invalid' : '' }}">
+                    <div class="form-group" style="grid-column: span 2;">
+                        <label class="form-label">Tipe Pelanggan <span style="color:#ef4444;">*</span></label>
+                        <div style="display:flex;gap:20px;margin-top:8px;">
+                            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+                                <input type="radio" name="customer_type" value="member" {{ old('customer_type', 'member') == 'member' ? 'checked' : '' }} onchange="toggleCustomerFields()"> 
+                                <span style="font-weight:600;">Member</span>
+                            </label>
+                            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+                                <input type="radio" name="customer_type" value="customer" {{ old('customer_type') == 'customer' ? 'checked' : '' }} onchange="toggleCustomerFields()"> 
+                                <span style="font-weight:600;">Customer (Non-Member)</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group" id="member-select-wrapper" style="display: {{ old('customer_type', 'member') == 'member' ? 'block' : 'none' }};">
+                        <label class="form-label">Pilih Member <span style="color:#ef4444;">*</span></label>
+                        <select name="id_customer" class="form-control {{ $errors->has('id_customer') ? 'is-invalid' : '' }}" onchange="calcTotal()">
                             <option value="">-- Pilih Pelanggan --</option>
                             @foreach($customers as $c)
-                                <option value="{{ $c->id }}" {{ old('id_customer') == $c->id ? 'selected' : '' }}>
+                                <option value="{{ $c->id }}" {{ old('id_customer') == $c->id ? 'selected' : '' }} data-orders="{{ $c->orders_count }}">
                                     {{ $c->customer_name }} ({{ $c->phone }})
                                 </option>
                             @endforeach
                         </select>
                         @error('id_customer')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
-                    <div>{{-- spacer --}}</div>
+
+                    <div id="customer-inputs-wrapper" style="display: {{ old('customer_type') == 'customer' ? 'contents' : 'none' }};">
+                        <div class="form-group">
+                            <label class="form-label">Nama Customer <span style="color:#ef4444;">*</span></label>
+                            <input type="text" name="customer_name" class="form-control {{ $errors->has('customer_name') ? 'is-invalid' : '' }}" 
+                                value="{{ old('customer_name') }}" placeholder="Nama Lengkap">
+                            @error('customer_name')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">No. Telepon</label>
+                            <input type="text" name="customer_phone" class="form-control {{ $errors->has('customer_phone') ? 'is-invalid' : '' }}" 
+                                value="{{ old('customer_phone') }}" placeholder="08xxxxxxxx">
+                            @error('customer_phone')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                        </div>
+                        <div class="form-group" style="grid-column: span 2;">
+                            <label class="form-label">Alamat</label>
+                            <textarea name="customer_address" class="form-control" rows="2" placeholder="Alamat Lengkap (Opsional)">{{ old('customer_address') }}</textarea>
+                        </div>
+                    </div>
                     <div class="form-group">
                         <label class="form-label">Tanggal Order <span style="color:#ef4444;">*</span></label>
                         <input type="date" name="order_date" class="form-control {{ $errors->has('order_date') ? 'is-invalid' : '' }}"
@@ -96,19 +133,41 @@
         <div class="card">
             <div class="card-title" style="margin-bottom:16px;"><i class="bi bi-cash-stack"></i> Ringkasan Order</div>
             <div id="summary-list" style="display:grid;gap:8px;margin-bottom:16px;"></div>
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
-                <span style="color:#94a3b8;font-size:14px;">Subtotal</span>
-                <div id="subtotal-display" style="font-size:16px;font-weight:600;color:var(--text);">Rp 0</div>
+            
+            <div style="background:rgba(22,163,74,.05);border-radius:12px;padding:16px;margin-bottom:16px;">
+                <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:13px;">
+                    <span style="color:#94a3b8;">Subtotal Item</span>
+                    <span id="subtotal-display" style="font-weight:600;">Rp 0</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:13px;">
+                    <span style="color:#94a3b8;">Pajak (10%)</span>
+                    <span id="tax-display" style="font-weight:600;color:#f59e0b;">Rp 0</span>
+                </div>
+                <div id="discount-row" style="display:none;justify-content:space-between;margin-bottom:8px;font-size:13px;color:var(--danger);font-weight:600;">
+                    <span>Diskon (<span id="discount-percent-display">0</span>%)</span>
+                    <span id="discount-amount-display">-Rp 0</span>
+                </div>
+                <hr style="border:none;border-top:1px dashed #e2e8f0;margin:8px 0;">
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-weight:700;font-size:14px;">Total Tagihan</span>
+                    <div id="grand-total-display" style="font-size:20px;font-weight:800;color:var(--primary);">Rp 0</div>
+                </div>
             </div>
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
-                <span style="color:#94a3b8;font-size:14px;">Pajak (10%)</span>
-                <div id="tax-display" style="font-size:16px;font-weight:600;color:#f59e0b;">Rp 0</div>
+
+            <div id="member-discount-info" style="display:none;background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.2);padding:10px;border-radius:10px;margin-bottom:16px;font-size:11px;color:var(--info);">
+                <i class="fas fa-gift"></i> <strong>Member Baru!</strong> Diskon 5% otomatis untuk transaksi pertama.
             </div>
-            <hr class="divider">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-                <span style="color:#94a3b8;font-size:14px;">Total</span>
-                <div id="total-display">Rp 0</div>
+
+            <div class="form-group" style="margin-bottom:16px;">
+                <label style="font-size:12px;color:var(--text-muted);font-weight:600;margin-bottom:6px;display:block;">KODE VOUCHER</label>
+                <div style="display:flex;gap:8px;">
+                    <input type="text" name="voucher_code" id="voucher_code" class="form-control" placeholder="DISKON10" style="text-transform:uppercase;font-size:13px;">
+                    <button type="button" class="btn btn-secondary btn-sm" onclick="applyVoucher()">Cek</button>
+                    <button type="button" id="remove-voucher-btn" class="btn btn-danger btn-sm" style="display:none;" onclick="removeVoucher()"><i class="fas fa-times"></i></button>
+                </div>
+                <div id="voucher-message" style="font-size:10px;margin-top:4px;font-weight:600;display:none;"></div>
             </div>
+
             <div class="form-group" style="margin-bottom:12px;">
                 <label style="font-size:13px;color:var(--text-muted);">Uang Bayar (Rp)</label>
                 <input type="number" name="order_pay" id="order_pay" class="form-control" form="orderForm"
@@ -131,6 +190,21 @@
 const services = @json($services);
 let rowIndex = 0;
 let currentGrandTotal = 0;
+
+function toggleCustomerFields() {
+    const type = document.querySelector('input[name="customer_type"]:checked').value;
+    const memberWrapper = document.getElementById('member-select-wrapper');
+    const customerWrapper = document.getElementById('customer-inputs-wrapper');
+    
+    if (type === 'member') {
+        memberWrapper.style.display = 'block';
+        customerWrapper.style.display = 'none';
+    } else {
+        memberWrapper.style.display = 'none';
+        customerWrapper.style.display = 'contents';
+    }
+    calcTotal();
+}
 
 function addRow(svcId = '', qty = 1, notes = '') {
     const container = document.getElementById('detail-rows');
@@ -184,7 +258,7 @@ function removeRow(btn) {
 
 function calcTotal() {
     const rows = document.querySelectorAll('.detail-line');
-    let grand = 0;
+    let itemsSubtotal = 0;
     let summaryHtml = '';
 
     rows.forEach(row => {
@@ -193,7 +267,7 @@ function calcTotal() {
         const opt = sel.options[sel.selectedIndex];
         const price = parseInt(opt?.dataset?.price || 0);
         const subtotal = Math.round(price * (qty / 1000));
-        grand += subtotal;
+        itemsSubtotal += subtotal;
 
         if (sel.value && qty > 0) {
             row.querySelector('.svc-subtotal').textContent = `Subtotal: Rp ${subtotal.toLocaleString('id-ID')}`;
@@ -206,19 +280,57 @@ function calcTotal() {
         }
     });
 
-    document.getElementById('subtotal-display').textContent = 'Rp ' + grand.toLocaleString('id-ID');
+    document.getElementById('subtotal-display').textContent = 'Rp ' + itemsSubtotal.toLocaleString('id-ID');
 
-    const tax = Math.round(grand * 0.1);
-    currentGrandTotal = grand + tax;
+    const tax = Math.round(itemsSubtotal * 0.1);
+    const subtotalWithTax = itemsSubtotal + tax;
     document.getElementById('tax-display').textContent = 'Rp ' + tax.toLocaleString('id-ID');
-    document.getElementById('total-display').textContent = 'Rp ' + currentGrandTotal.toLocaleString('id-ID');
+
+    // --- DISCOUNT CALCULATION ---
+    let totalDiscountPercent = 0;
+    
+    // 1. New Member Discount (5% automatically)
+    const type = document.querySelector('input[name="customer_type"]:checked').value;
+    const memberDiscountInfo = document.getElementById('member-discount-info');
+    if (type === 'member') {
+        const select = document.querySelector('select[name="id_customer"]');
+        const opt = select.options[select.selectedIndex];
+        // If it's a first time member (data-orders == 0)
+        if (opt && opt.value && opt.dataset.orders == 0) {
+            totalDiscountPercent += 5;
+            memberDiscountInfo.style.display = 'block';
+        } else {
+            memberDiscountInfo.style.display = 'none';
+        }
+    } else {
+        memberDiscountInfo.style.display = 'none';
+    }
+
+    // 2. Voucher Discount
+    if (appliedVoucher) {
+        totalDiscountPercent += appliedVoucher.discount_percent;
+    }
+
+    const discountAmount = Math.round(subtotalWithTax * (totalDiscountPercent / 100));
+    currentGrandTotal = subtotalWithTax - discountAmount;
+
+    // --- VIEW UPDATES ---
+    const discountRow = document.getElementById('discount-row');
+    if (totalDiscountPercent > 0) {
+        discountRow.style.display = 'flex';
+        document.getElementById('discount-percent-display').textContent = totalDiscountPercent;
+        document.getElementById('discount-amount-display').textContent = '-Rp ' + discountAmount.toLocaleString('id-ID');
+    } else {
+        discountRow.style.display = 'none';
+    }
+
+    document.getElementById('grand-total-display').textContent = 'Rp ' + currentGrandTotal.toLocaleString('id-ID');
 
     const payInput = document.getElementById('order_pay');
     const pay = parseInt(payInput.value) || 0;
     const change = Math.max(0, pay - currentGrandTotal);
     document.getElementById('change-display').textContent = 'Rp ' + change.toLocaleString('id-ID');
 
-    // Validate pay amount and update UI feedback
     const payError = document.getElementById('pay-error');
     const submitBtn = document.getElementById('submitBtn');
     const hasPay = payInput.value !== '';
@@ -232,6 +344,76 @@ function calcTotal() {
 
     document.getElementById('summary-list').innerHTML = summaryHtml ||
         '<div style="color:#64748b;font-size:13px;text-align:center;">Belum ada layanan dipilih</div>';
+}
+
+let appliedVoucher = null;
+
+function applyVoucher() {
+    const code = document.getElementById('voucher_code').value;
+    const type = document.querySelector('input[name="customer_type"]:checked').value;
+    const idCust = document.querySelector('select[name="id_customer"]').value;
+    const phone = document.getElementsByName('customer_phone')[0].value;
+    const msg = document.getElementById('voucher-message');
+    
+    if (!code) {
+        msg.textContent = 'Masukkan kode voucher dahulu.';
+        msg.style.color = 'var(--danger)';
+        msg.style.display = 'block';
+        return;
+    }
+
+    if (type === 'member' && !idCust) {
+        msg.textContent = 'Pilih member dahulu.';
+        msg.style.color = 'var(--danger)';
+        msg.style.display = 'block';
+        return;
+    }
+
+    fetch('{{ route("vouchers.check") }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({
+            code: code,
+            id_customer: type === 'member' ? idCust : null,
+            customer_phone: type === 'customer' ? phone : null
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            appliedVoucher = {
+                id: data.id,
+                discount_percent: data.discount_percent
+            };
+            msg.textContent = data.message;
+            msg.style.color = 'var(--primary)';
+            msg.style.display = 'block';
+            document.getElementById('remove-voucher-btn').style.display = 'block';
+            document.getElementById('voucher_code').readOnly = true;
+            calcTotal();
+        } else {
+            msg.textContent = data.message;
+            msg.style.color = 'var(--danger)';
+            msg.style.display = 'block';
+        }
+    })
+    .catch(err => {
+        msg.textContent = 'Terjadi kesalahan sistem.';
+        msg.style.color = 'var(--danger)';
+        msg.style.display = 'block';
+    });
+}
+
+function removeVoucher() {
+    appliedVoucher = null;
+    document.getElementById('voucher_code').value = '';
+    document.getElementById('voucher_code').readOnly = false;
+    document.getElementById('remove-voucher-btn').style.display = 'none';
+    document.getElementById('voucher-message').style.display = 'none';
+    calcTotal();
 }
 
 // Block submission if pay is empty or insufficient

@@ -11,14 +11,22 @@ class TransOrder extends Model
 
     protected $table = 'trans_order';
     protected $fillable = [
-        'id_customer', 'order_code', 'order_date', 'order_end_date',
+        'id_customer', 'customer_name', 'customer_phone', 'customer_address',
+        'id_voucher', 'discount_amount',
+        'order_code', 'order_date', 'order_end_date',
         'order_status', 'order_pay', 'order_change', 'total'
     ];
 
     protected $casts = [
         'order_date' => 'date',
         'order_end_date' => 'date',
+        'discount_amount' => 'integer'
     ];
+
+    public function voucher()
+    {
+        return $this->belongsTo(Voucher::class, 'id_voucher');
+    }
 
     public function customer()
     {

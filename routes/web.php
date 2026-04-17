@@ -9,6 +9,7 @@ use App\Http\Controllers\TransOrderController;
 use App\Http\Controllers\TransLaundryPickupController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\VoucherController;
 
 // Auth Routes
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -24,6 +25,8 @@ Route::middleware('auth')->group(function () {
     Route::middleware('role:admin')->group(function () {
         Route::resource('users', UserController::class)->except(['show']);
         Route::resource('services', TypeOfServiceController::class)->parameters(['services' => 'service'])->except(['show']);
+        Route::resource('vouchers', VoucherController::class)->except(['show']);
+        Route::post('/vouchers/check', [VoucherController::class, 'checkVoucher'])->name('vouchers.check');
     });
 
     // Operator Routes

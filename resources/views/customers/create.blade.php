@@ -1,11 +1,11 @@
 @extends('layouts.app')
-@section('title', 'Tambah Pelanggan')
-@section('page-title', 'Tambah Pelanggan')
+@section('title', 'Tambah Member')
+@section('page-title', 'Tambah Member')
 
 @section('content')
 <div class="card" style="max-width:600px;">
     <div class="card-header">
-        <div class="card-title"><i class="bi bi-person-plus"></i> Form Tambah Pelanggan</div>
+        <div class="card-title"><i class="bi bi-person-plus"></i> Form Tambah Member</div>
         <a href="{{ route('customers.index') }}" class="btn btn-secondary btn-sm">
             <i class="fas fa-arrow-left"></i> Kembali
         </a>
@@ -14,7 +14,7 @@
     <form method="POST" action="{{ route('customers.store') }}">
         @csrf
         <div class="form-group">
-            <label class="form-label">Nama Pelanggan <span style="color:#ef4444;">*</span></label>
+            <label class="form-label">Nama Member <span style="color:#ef4444;">*</span></label>
             <input type="text" name="customer_name" class="form-control {{ $errors->has('customer_name') ? 'is-invalid' : '' }}"
                 value="{{ old('customer_name') }}" placeholder="Masukkan nama lengkap" autofocus>
             @error('customer_name')<div class="invalid-feedback">{{ $message }}</div>@enderror
@@ -36,7 +36,7 @@
 
         <div style="display:flex;gap:10px;margin-top:24px;">
             <button type="submit" class="btn btn-primary">
-                <i class="fas fa-save"></i> Simpan Pelanggan
+                <i class="fas fa-save"></i> Simpan Member
             </button>
             <a href="{{ route('customers.index') }}" class="btn btn-secondary">Batal</a>
         </div>
