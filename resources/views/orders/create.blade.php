@@ -139,14 +139,16 @@
                     <span style="color:#94a3b8;">Subtotal Item</span>
                     <span id="subtotal-display" style="font-weight:600;">Rp 0</span>
                 </div>
-                <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:13px;">
+                <!-- DISABLED: Tax display (10% tax feature disabled) -->
+                <!-- <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:13px;">
                     <span style="color:#94a3b8;">Pajak (10%)</span>
                     <span id="tax-display" style="font-weight:600;color:#f59e0b;">Rp 0</span>
-                </div>
-                <div id="discount-row" style="display:none;justify-content:space-between;margin-bottom:8px;font-size:13px;color:var(--danger);font-weight:600;">
+                </div> -->
+                <!-- DISABLED: Discount display (voucher and member discounts disabled) -->
+                <!-- <div id="discount-row" style="display:none;justify-content:space-between;margin-bottom:8px;font-size:13px;color:var(--danger);font-weight:600;">
                     <span>Diskon (<span id="discount-percent-display">0</span>%)</span>
                     <span id="discount-amount-display">-Rp 0</span>
-                </div>
+                </div> -->
                 <hr style="border:none;border-top:1px dashed #e2e8f0;margin:8px 0;">
                 <div style="display:flex;justify-content:space-between;align-items:center;">
                     <span style="font-weight:700;font-size:14px;">Total Tagihan</span>
@@ -154,11 +156,13 @@
                 </div>
             </div>
 
-            <div id="member-discount-info" style="display:none;background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.2);padding:10px;border-radius:10px;margin-bottom:16px;font-size:11px;color:var(--info);">
+            <!-- DISABLED: New member discount info (5% discount for new members disabled) -->
+            <!-- <div id="member-discount-info" style="display:none;background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.2);padding:10px;border-radius:10px;margin-bottom:16px;font-size:11px;color:var(--info);">
                 <i class="fas fa-gift"></i> <strong>Member Baru!</strong> Diskon 5% otomatis untuk transaksi pertama.
-            </div>
+            </div> -->
 
-            <div class="form-group" style="margin-bottom:16px;">
+            <!-- DISABLED: Voucher input form (all voucher features disabled) -->
+            <!-- <div class="form-group" style="margin-bottom:16px;">
                 <label style="font-size:12px;color:var(--text-muted);font-weight:600;margin-bottom:6px;display:block;">KODE VOUCHER</label>
                 <div style="display:flex;gap:8px;">
                     <input type="text" name="voucher_code" id="voucher_code" class="form-control" placeholder="DISKON10" style="text-transform:uppercase;font-size:13px;">
@@ -166,7 +170,7 @@
                     <button type="button" id="remove-voucher-btn" class="btn btn-danger btn-sm" style="display:none;" onclick="removeVoucher()"><i class="fas fa-times"></i></button>
                 </div>
                 <div id="voucher-message" style="font-size:10px;margin-top:4px;font-weight:600;display:none;"></div>
-            </div>
+            </div> -->
 
             <div class="form-group" style="margin-bottom:12px;">
                 <label style="font-size:13px;color:var(--text-muted);">Uang Bayar (Rp)</label>
@@ -282,47 +286,23 @@ function calcTotal() {
 
     document.getElementById('subtotal-display').textContent = 'Rp ' + itemsSubtotal.toLocaleString('id-ID');
 
-    const tax = Math.round(itemsSubtotal * 0.1);
-    const subtotalWithTax = itemsSubtotal + tax;
-    document.getElementById('tax-display').textContent = 'Rp ' + tax.toLocaleString('id-ID');
+    // DISABLED: Tax calculation
+    // const tax = Math.round(itemsSubtotal * 0.1);
+    // const subtotalWithTax = itemsSubtotal + tax;
+    // document.getElementById('tax-display').textContent = 'Rp ' + tax.toLocaleString('id-ID');
+    const tax = 0;  // No tax
+    const subtotalWithTax = itemsSubtotal;  // Total without tax
 
-    // --- DISCOUNT CALCULATION ---
-    let totalDiscountPercent = 0;
-    
-    // 1. New Member Discount (5% automatically)
-    const type = document.querySelector('input[name="customer_type"]:checked').value;
-    const memberDiscountInfo = document.getElementById('member-discount-info');
-    if (type === 'member') {
-        const select = document.querySelector('select[name="id_customer"]');
-        const opt = select.options[select.selectedIndex];
-        // If it's a first time member (data-orders == 0)
-        if (opt && opt.value && opt.dataset.orders == 0) {
-            totalDiscountPercent += 5;
-            memberDiscountInfo.style.display = 'block';
-        } else {
-            memberDiscountInfo.style.display = 'none';
-        }
-    } else {
-        memberDiscountInfo.style.display = 'none';
-    }
+    // DISABLED: Discount calculations (member discount and voucher)
+    // let totalDiscountPercent = 0;
+    // // ... all discount logic disabled
+    let totalDiscountPercent = 0;  // No discounts applied
+    const discountAmount = 0;  // No discounts
+    currentGrandTotal = subtotalWithTax;  // Total without any discounts
 
-    // 2. Voucher Discount
-    if (appliedVoucher) {
-        totalDiscountPercent += appliedVoucher.discount_percent;
-    }
-
-    const discountAmount = Math.round(subtotalWithTax * (totalDiscountPercent / 100));
-    currentGrandTotal = subtotalWithTax - discountAmount;
-
-    // --- VIEW UPDATES ---
-    const discountRow = document.getElementById('discount-row');
-    if (totalDiscountPercent > 0) {
-        discountRow.style.display = 'flex';
-        document.getElementById('discount-percent-display').textContent = totalDiscountPercent;
-        document.getElementById('discount-amount-display').textContent = '-Rp ' + discountAmount.toLocaleString('id-ID');
-    } else {
-        discountRow.style.display = 'none';
-    }
+    // DISABLED: View updates for discounts
+    // const discountRow = document.getElementById('discount-row');
+    // ... discount display logic disabled
 
     document.getElementById('grand-total-display').textContent = 'Rp ' + currentGrandTotal.toLocaleString('id-ID');
 
@@ -346,8 +326,10 @@ function calcTotal() {
         '<div style="color:#64748b;font-size:13px;text-align:center;">Belum ada layanan dipilih</div>';
 }
 
+// DISABLED: Voucher functionality
 let appliedVoucher = null;
 
+/* DISABLED: Voucher checking and application
 function applyVoucher() {
     const code = document.getElementById('voucher_code').value;
     const type = document.querySelector('input[name="customer_type"]:checked').value;
@@ -409,12 +391,14 @@ function applyVoucher() {
 
 function removeVoucher() {
     appliedVoucher = null;
-    document.getElementById('voucher_code').value = '';
-    document.getElementById('voucher_code').readOnly = false;
-    document.getElementById('remove-voucher-btn').style.display = 'none';
-    document.getElementById('voucher-message').style.display = 'none';
-    calcTotal();
+    // DISABLED: Voucher removal logic
+    // document.getElementById('voucher_code').value = '';
+    // document.getElementById('voucher_code').readOnly = false;
+    // document.getElementById('remove-voucher-btn').style.display = 'none';
+    // document.getElementById('voucher-message').style.display = 'none';
+    // calcTotal();
 }
+*/
 
 // Block submission if pay is empty or insufficient
 document.getElementById('orderForm').addEventListener('submit', function (e) {

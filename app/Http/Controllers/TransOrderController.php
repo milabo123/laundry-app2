@@ -92,42 +92,23 @@ class TransOrderController extends Controller
             ]);
         }
 
-        $tax         = (int) round($total * 0.1);
-        $subtotalWithTax = $total + $tax;
+        // DISABLED: Tax calculation (was 10%)
+        // $tax         = (int) round($total * 0.1);
+        // $subtotalWithTax = $total + $tax;
+        $subtotalWithTax = $total;  // Total without tax
 
-        // --- NEW MEMBER & VOUCHER LOGIC ---
-        $discountPercent = 0;
-        $voucherId = null;
-
-        // 1. New Member Discount (5% on first transaction)
-        if ($request->customer_type === 'member' && $request->id_customer) {
-            $isFirstOrder = !TransOrder::where('id_customer', $request->id_customer)->exists();
-            if ($isFirstOrder) {
-                $discountPercent += 5;
-            }
-        }
-
-        // 2. Voucher Discount
-        if ($request->voucher_code) {
-            $voucher = \App\Models\Voucher::where('code', strtoupper($request->voucher_code))->first();
-            if ($voucher && $voucher->is_active && (!$voucher->expires_at || !$voucher->expires_at->isPast())) {
-                $canUse = true;
-                if ($request->customer_type === 'member') {
-                    $canUse = !TransOrder::where('id_customer', $request->id_customer)->where('id_voucher', $voucher->id)->exists();
-                } elseif ($request->customer_phone) {
-                    $canUse = !TransOrder::where('customer_phone', $request->customer_phone)->where('id_voucher', $voucher->id)->exists();
-                }
-
-                if ($canUse) {
-                    $discountPercent += $voucher->discount_percent;
-                    $voucherId = $voucher->id;
-                }
-            }
-        }
-
-        $discountAmount = (int) round($subtotalWithTax * ($discountPercent / 100));
-        $grandTotal     = $subtotalWithTax - $discountAmount;
-        // ----------------------------------
+        // DISABLED: NEW MEMBER & VOUCHER LOGIC
+        // $discountPercent = 0;
+        // $voucherId = null;
+        // ... (all discount and voucher logic disabled)
+        
+        // DISABLED: All discounts are set to 0
+        // $discountAmount = (int) round($subtotalWithTax * ($discountPercent / 100));
+        // $grandTotal     = $subtotalWithTax - $discountAmount;
+        
+        $discountAmount = 0;  // No discounts applied
+        $voucherId = null;     // No vouchers used
+        $grandTotal = $subtotalWithTax;  // Total without any discounts
 
         $request->validate([
             'order_pay' => 'required|integer|min:' . $grandTotal,
@@ -138,8 +119,9 @@ class TransOrderController extends Controller
 
         $order->update([
             'total'           => $grandTotal,
-            'id_voucher'      => $voucherId,
-            'discount_amount' => $discountAmount,
+            // DISABLED: voucher and discount fields
+            // 'id_voucher'      => $voucherId,
+            // 'discount_amount' => $discountAmount,
             'order_pay'       => $orderPay > 0 ? $orderPay : null,
             'order_change'    => $orderPay > 0 ? $orderChange : null,
         ]);
@@ -197,8 +179,10 @@ class TransOrderController extends Controller
             ]);
         }
 
-        $tax         = (int) round($total * 0.1);
-        $grandTotal  = $total + $tax;
+        // DISABLED: Tax calculation (was 10%)
+        // $tax         = (int) round($total * 0.1);
+        // $grandTotal  = $total + $tax;
+        $grandTotal  = $total;  // Total without tax
 
         $request->validate([
             'order_pay' => 'required|integer|min:' . $grandTotal,

@@ -96,7 +96,7 @@
 
     @if(in_array(auth()->user()->id_level, [1, 2])) {{-- Admin & Operator --}}
         <a href="{{ route('customers.create') }}" class="btn btn-success">
-            <i class="fas fa-user-plus"></i> Tambah Pelanggan
+            <i class="fas fa-user-plus"></i> Tambah Member
         </a>
     @endif
 
